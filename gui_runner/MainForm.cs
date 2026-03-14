@@ -7,14 +7,14 @@ namespace MaxEntRunner
     public partial class MainForm : Form
     {
         private ScriptConfig? config;
-        private ComboBox scriptDropdown;
-        private TextBox descriptionBox;
-        private Panel paramPanel;
+        private ComboBox scriptDropdown = null!;
+        private TextBox descriptionBox = null!;
+        private Panel paramPanel = null!;
         private Dictionary<string, TextBox> paramTextBoxes = new();
-        private Button runButton;
-        private Button viewImageButton;
-        private RichTextBox outputBox;
-        private PictureBox imageBox;
+        private Button runButton = null!;
+        private Button viewImageButton = null!;
+        private RichTextBox outputBox = null!;
+        private PictureBox imageBox = null!;
         private Process? currentProcess;
 
         public MainForm()
