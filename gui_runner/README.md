@@ -6,7 +6,30 @@
 
 ## 📦 For End Users (Simple!)
 
-### Quick Start:
+### Quick Start - Option 1: Pre-Built (No Build Needed!)
+
+1. **Clone the repo:**
+   ```bash
+   git clone https://github.com/mkamoski/maxent
+   cd maxent/gui_runner_published
+   ```
+
+2. **Extract the ZIP:**
+   ```powershell
+   Expand-Archive -Path MaxEntRunner.zip -DestinationPath .
+   ```
+   OR right-click `MaxEntRunner.zip` → **Extract All**
+
+3. **Run it:**
+   ```powershell
+   .\MaxEntRunner.exe
+   ```
+
+**That's it! Pre-built, just extract and run!**
+
+---
+
+### Quick Start - Option 2: Build It Yourself
 
 1. **Clone the repo:**
    ```bash
@@ -29,7 +52,7 @@
    .\MaxEntRunner.exe
    ```
 
-**Note:** The EXE is not committed to Git (it's 161 MB). You build it once locally. Takes ~40 seconds.
+**Build time: ~40 seconds. Requires .NET 8.0 SDK.**
 
 ---
 
