@@ -23,6 +23,9 @@ if ($LASTEXITCODE -eq 0) {
     # Create new ZIP
     Compress-Archive -Path $exePath -DestinationPath $zipPath -CompressionLevel Optimal
 
+    # Unblock the EXE (Windows Smart App Control)
+    Unblock-File -Path $exePath -ErrorAction SilentlyContinue
+
     Write-Host ""
     Write-Host "SUCCESS!" -ForegroundColor Green
     Write-Host ""
