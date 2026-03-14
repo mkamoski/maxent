@@ -123,4 +123,26 @@ gui_runner_published/
 Add-MpPreference -ExclusionPath "C:\Users\mkamoski1\source\repos\maxent\gui_runner_published\MaxEntRunner.exe"
 ```
 
+### Turn Off Smart App Control Completely (Most Reliable):
+
+**For Windows 11:**
+
+1. Press **Win + I** (Settings)
+2. Go to **Privacy & security** → **Windows Security**
+3. Click **App & browser control**
+4. Click **Smart App Control settings**
+5. Select **Off**
+6. **Restart your computer**
+
+**OR via PowerShell (as Admin):**
+```powershell
+# Check current status:
+Get-MpPreference | Select-Object EnableControlledFolderAccess
+
+# Note: Smart App Control can only be fully disabled in Settings UI
+# It requires a reboot and cannot be re-enabled without a clean Windows install
+```
+
+⚠️ **Warning:** Once you turn off Smart App Control, you cannot turn it back on without a clean Windows installation. However, this is the most reliable way to run self-built/unsigned applications.
+
 **This is safe!** You built it yourself from open source code. 🔒
