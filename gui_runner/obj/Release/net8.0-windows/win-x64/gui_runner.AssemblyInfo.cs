@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MaxEntRunner")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6c72341d9ad061b48932086bb977149fd8a76d5d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+855667bb438284afbc4b3c2c59ad0f68af2d0ee0")]
 [assembly: System.Reflection.AssemblyProductAttribute("MaxEntRunner")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MaxEntRunner")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

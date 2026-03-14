@@ -12,8 +12,7 @@ import logging
 
 import numpy as np
 import scipy.stats
-from scipy.interpolate import interp2d
-from scipy.interpolate import spline
+from scipy.interpolate import interp2d, make_interp_spline
 from scipy.stats import norm
 
 import gym
