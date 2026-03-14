@@ -49,9 +49,11 @@ htmlcov/
 # ==========================================
 # Project Specific - MaxEnt GUI Runner
 # ==========================================
-# Don't commit the large EXE (users build it themselves)
+# Don't commit the large EXE (users extract from ZIP or build it)
 gui_runner_published/MaxEntRunner.exe
 gui_runner_published/*.pdb
+# But DO commit the ZIP (it's only 63 MB)
+!gui_runner_published/MaxEntRunner.zip
 
 # ==========================================
 # Project Specific - MaxEnt Outputs

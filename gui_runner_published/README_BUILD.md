@@ -1,36 +1,58 @@
-# MaxEnt Script Runner - Pre-Built EXE
+# MaxEnt Script Runner - Get the EXE
 
-**⚠️ The EXE file is NOT in this folder by default!**
+**Two ways to get the EXE:**
 
 ---
 
-## 🔨 Build It (One Time, 40 Seconds)
+## 🎯 Option 1: Download Pre-Built (EASIEST!)
 
-### Option 1: Easy Way (PowerShell Script)
+**Just extract and run - no build needed!**
+
+1. **Extract the ZIP:**
+   ```powershell
+   Expand-Archive -Path MaxEntRunner.zip -DestinationPath .
+   ```
+
+   OR right-click `MaxEntRunner.zip` → **Extract All**
+
+2. **Run it:**
+   - Double-click `MaxEntRunner.exe`
+
+**That's it! 63 MB ZIP, extracts to 161 MB EXE.**
+
+---
+
+## 🔨 Option 2: Build It Yourself (40 Seconds)
+
+**If you prefer to build from source:**
+
+### Easy Way (PowerShell Script)
 ```powershell
 cd ..\gui_runner
 .\Publish.ps1
 ```
 
-### Option 2: Manual Way
+### Manual Way
 ```powershell
 cd ..\gui_runner
 dotnet publish -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o ..\gui_runner_published
 ```
 
-**Result:** `MaxEntRunner.exe` will be created in THIS folder!
+**Requires:** .NET 8.0 SDK (free download)
 
 ---
 
-## ❓ Why Isn't the EXE Committed?
+## ❓ Why Both Options?
 
-**The EXE is 161 MB** - GitHub has a 100 MB file size limit.
+**Pre-built ZIP (Option 1):**
+- ✅ No tools needed
+- ✅ Instant (just extract)
+- ✅ For users who don't have .NET SDK
 
-Building it yourself:
-- ✅ Takes 40 seconds
-- ✅ Requires only .NET SDK (free)
-- ✅ Creates fresh, trusted binary
-- ✅ Avoids Git LFS complexity
+**Build from source (Option 2):**
+- ✅ Creates fresh binary
+- ✅ For security-conscious users
+- ✅ If you want to modify the code
 
 ---
 
