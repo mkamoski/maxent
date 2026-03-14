@@ -26,10 +26,13 @@
 
 **If you prefer to build from source:**
 
-### Easy Way (PowerShell Script)
+### Easy Way (PowerShell Script - One-Liner)
 ```powershell
-cd ..\gui_runner
-.\Publish.ps1
+# Main user (mkamoski1) - copy and paste this:
+cd C:\Users\mkamoski1\source\repos\maxent\gui_runner; .\Publish.ps1
+
+# Other users - update path for your machine:
+# cd C:\YOUR\PATH\TO\maxent\gui_runner; .\Publish.ps1
 ```
 
 ### Manual Way
