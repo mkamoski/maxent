@@ -1,0 +1,123 @@
+# Complete Requirements for MaxEnt Project
+# Based on requirements_phase1.txt plus missing dependencies identified from code analysis
+
+# ============================================================================
+# PHASE 1 DEPENDENCIES (Already Installed)
+# ============================================================================
+
+# Core Deep Learning Frameworks
+tensorflow==1.15.0
+tensorflow-estimator==1.15.1
+tensorboard==1.15.0
+torch==1.7.1
+
+# Numerical Computing
+numpy==1.21.6
+scipy==1.7.3
+
+# Plotting and Visualization
+matplotlib==3.5.3
+Pillow==9.5.0
+
+# TensorFlow Dependencies
+absl-py==2.1.0
+astor==0.8.1
+gast==0.2.2
+google-pasta==0.2.0
+grpcio==1.62.3
+h5py==3.8.0
+Keras-Applications==1.0.8
+Keras-Preprocessing==1.1.2
+Markdown==3.4.4
+MarkupSafe==2.1.5
+opt-einsum==3.3.0
+protobuf==3.20.0
+termcolor==2.3.0
+Werkzeug==2.2.3
+wrapt==1.16.0
+
+# Utilities
+cycler==0.11.0
+fonttools==4.38.0
+joblib==1.3.2
+kiwisolver==1.4.5
+packaging==24.0
+pyparsing==3.1.4
+python-dateutil==2.9.0.post0
+six==1.17.0
+tabulate==0.9.0
+typing_extensions==4.7.1
+importlib-metadata==6.7.0
+zipp==3.15.0
+
+# ============================================================================
+# PHASE 2 DEPENDENCIES (TO BE INSTALLED)
+# ============================================================================
+
+# Machine Learning and Optimization
+scikit-learn==0.24.2        # For KernelDensity, PCA in reward_fn.py
+cvxpy==1.1.18               # For convex optimization in utils.py and explorer.py
+
+# Reinforcement Learning Environments
+gym==0.17.3                 # OpenAI Gym (base version, may need custom fork)
+# Note: Custom gym fork may be needed from https://github.com/abbyvansoest/gym-fork
+# To install custom fork: pip install git+https://github.com/abbyvansoest/gym-fork.git
+
+# MuJoCo Physics Engine
+# mujoco-py==2.0.2.13       # COMMENTED OUT - Requires MuJoCo binaries installed first
+# Note: Install MuJoCo binaries manually first, then uncomment and install mujoco-py
+# See: https://github.com/openai/mujoco-py#install-mujoco
+
+# Video Processing (for video recording in environments)
+opencv-python==4.5.5.64     # For video stitching scripts
+imageio==2.19.5             # Alternative video I/O
+imageio-ffmpeg==0.4.7       # FFmpeg wrapper for video
+
+# Additional Utilities
+seaborn==0.11.2             # Enhanced plotting (used in some experiments)
+pandas==1.3.5               # Data manipulation (for experiment analysis)
+cloudpickle==1.6.0          # Extended pickle support (for policy serialization)
+
+# ============================================================================
+# PHASE 3 DEPENDENCIES (EXTERNAL REPOSITORIES)
+# ============================================================================
+
+# OpenAI SpinningUp (RL algorithms framework)
+# Install separately: 
+# git clone https://github.com/openai/spinningup.git
+# cd spinningup
+# pip install -e .
+
+# Custom Gym Fork (optional but recommended for full compatibility)
+# git clone https://github.com/abbyvansoest/gym-fork.git
+# cd gym-fork  
+# pip install -e .
+
+# ============================================================================
+# OPTIONAL DEPENDENCIES
+# ============================================================================
+
+# For GPU support with TensorFlow 1.15 (requires CUDA 10.0 and cuDNN 7.6)
+# tensorflow-gpu==1.15.0
+
+# For Jupyter notebooks (if creating analysis notebooks)
+# jupyter==1.0.0
+# notebook==6.4.12
+
+# For distributed training (if using MPI)
+# mpi4py==3.1.3
+
+# ============================================================================
+# COMPATIBILITY NOTES
+# ============================================================================
+
+# This project requires:
+# - Python 3.7.x (specifically tested with 3.7.9)
+# - Windows 10 or Linux (macOS may work but untested)
+# - 16GB+ RAM recommended for full state space discretization
+# - GPU with CUDA 10.0 for GPU-accelerated training (optional)
+
+# Known Issues:
+# - TensorFlow 1.15 is deprecated and may have security vulnerabilities
+# - Some packages may not have wheels for Python 3.7 on all platforms
+# - MuJoCo requires separate binary installation and possibly a license

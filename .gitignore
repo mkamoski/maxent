@@ -1,0 +1,127 @@
+# ========================================== 
+# Operating System & IDE
+# ==========================================
+.vs/
+.vscode/
+*.user
+*.DS_Store
+Thumbs.db
+
+# ==========================================
+# Python Core & Byte-compiled Files
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.pyd
+*.dll
+*.dylib
+
+# ==========================================
+# Virtual Environments & Packaging
+# ==========================================
+.env
+.venv
+env/
+venv/
+venv_*/
+ENV/
+build/
+develop-eggs/
+dist/
+eggs/
+.eggs/
+*.egg-info/
+*.egg
+pip-wheel-metadata/
+
+# ==========================================
+# Testing, Coverage, & Jupyter
+# ==========================================
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ipynb_checkpoints/
+.tox/
+
+# ==========================================
+# Project Specific
+# ==========================================
+*.log
+logs/
+videos/
+data/
+classic_control_copy/
+gym_patch/
+test.sh
+
+# ==========================================
+# Setup & Installation Files (Generated)
+# ==========================================
+mujoco_install.txt
+test_output.txt
+test_results.txt
+constraints.txt
+
+# ==========================================
+# MuJoCo Related
+# ==========================================
+.mujoco/
+*.mjkey
+mjkey.txt
+
+# ==========================================
+# Model Checkpoints & Training Outputs
+# ==========================================
+checkpoints/
+models/
+*.ckpt
+*.pth
+*.h5
+*.pkl
+*.pickle
+simple_save*/
+openaigym.*.json
+openaigym.*.mp4
+openaigym.*.meta.json
+openaigym.*.stats.json
+openaigym.*.manifest.json
+
+# ==========================================
+# Experiment & Plot Outputs
+# ==========================================
+figs/
+plots/
+*.png
+*.jpg
+*.jpeg
+*.pdf
+!README*.png
+!docs/*.png
+
+# ==========================================
+# Temporary & Cache Files
+# ==========================================
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.cache/
+
+
+# ==========================================
+# TensorFlow Checkpoints
+# ==========================================
+*.pb
+*.index
+*.data-*-of-*
+
+# ==========================================
+# Generic Gym / RL Outputs
+# ==========================================
+*.mp4
+*.json
+
