@@ -28,7 +28,7 @@ namespace MaxEntRunner
             // Form setup
             this.Text = "MaxEnt Python Script Runner";
             this.Size = new Size(1024, 768);
-            this.MinimumSize = new Size(800, 600);
+            this.MinimumSize = new Size(1024, 768);
             this.StartPosition = FormStartPosition.CenterScreen;
 
             // Script dropdown
