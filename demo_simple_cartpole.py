@@ -82,7 +82,7 @@ output_file = 'demo_cartpole_results.png'
 plt.savefig(output_file, dpi=150, bbox_inches='tight')
 print()
 print("=" * 70)
-print(f"✓ SUCCESS! Graph saved to: {output_file}")
+print(f"SUCCESS! Graph saved to: {output_file}")
 print()
 print("Statistics:")
 print(f"  Mean Reward:   {mean_reward:.2f} ± {std_reward:.2f}")

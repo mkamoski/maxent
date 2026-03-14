@@ -47,7 +47,14 @@ htmlcov/
 .tox/
 
 # ==========================================
-# Project Specific
+# Project Specific - MaxEnt GUI Runner
+# ==========================================
+# Don't commit the large EXE (users build it themselves)
+gui_runner_published/MaxEntRunner.exe
+gui_runner_published/*.pdb
+
+# ==========================================
+# Project Specific - MaxEnt Outputs
 # ==========================================
 *.log
 logs/
