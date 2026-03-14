@@ -37,12 +37,15 @@
    cd maxent/gui_runner
    ```
 
-2. **Build the EXE (one command):**
+2. **Build the EXE (one command - copy & paste):**
    ```powershell
-   # Windows PowerShell:
-   .\Publish.ps1
+   # Main user (mkamoski1):
+   cd C:\Users\mkamoski1\source\repos\maxent\gui_runner; .\Publish.ps1
 
-   # OR manually:
+   # Other users - update path:
+   # cd C:\YOUR\PATH\TO\maxent\gui_runner; .\Publish.ps1
+
+   # OR manually with dotnet:
    dotnet publish -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o ..\gui_runner_published
    ```
 
