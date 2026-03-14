@@ -18,7 +18,13 @@
 2. **Run it:**
    - Double-click `MaxEntRunner.exe`
 
+3. **If Windows blocks it:**
+   - Click **"More info"** → **"Run anyway"**
+   - OR: Right-click EXE → **Properties** → Check **"Unblock"** → **Apply**
+
 **That's it! 63 MB ZIP, extracts to 161 MB EXE.**
+
+> **Note:** Windows Smart App Control may block unsigned EXEs. This is normal for self-built apps. Choose "Run anyway" to proceed.
 
 ---
 
@@ -90,3 +96,31 @@ gui_runner_published/
 ---
 
 **First time setup? Just run `Publish.ps1` in the parent folder!** 🎯
+
+---
+
+## 🛡️ Troubleshooting: Windows Smart App Control
+
+**Problem:** "SmartScreen prevented an unrecognized app from starting"
+
+**Why?** The EXE isn't digitally signed (costs $100-400/year for a certificate).
+
+**Solutions:**
+
+### Quick Fix (Recommended):
+1. Click **"More info"** in the warning
+2. Click **"Run anyway"**
+3. Windows remembers your choice
+
+### Permanent Fix - Unblock the File:
+1. Right-click `MaxEntRunner.exe`
+2. Select **Properties**
+3. Check **"Unblock"** at the bottom
+4. Click **Apply** → **OK**
+
+### Add Security Exception (PowerShell as Admin):
+```powershell
+Add-MpPreference -ExclusionPath "C:\Users\mkamoski1\source\repos\maxent\gui_runner_published\MaxEntRunner.exe"
+```
+
+**This is safe!** You built it yourself from open source code. 🔒
