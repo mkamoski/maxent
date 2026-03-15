@@ -290,10 +290,22 @@ namespace MaxEntRunner
                     // Try to load output image
                     if (!string.IsNullOrEmpty(script.outputImage))
                     {
-                        string imagePath = Path.GetFullPath(Path.Combine(baseDir, script.outputImage));
+                        // Look for image in working directory first (where Python actually outputs it)
+                        string imagePath = Path.GetFullPath(Path.Combine(maxentRoot, script.outputImage));
+
+                        // Fallback: try relative to EXE location
+                        if (!File.Exists(imagePath))
+                        {
+                            imagePath = Path.GetFullPath(Path.Combine(baseDir, script.outputImage));
+                        }
+
                         if (File.Exists(imagePath))
                         {
                             LoadImage(imagePath);
+                        }
+                        else
+                        {
+                            AppendOutput($"\nImage not found: {imagePath}\n", Color.Yellow);
                         }
                     }
                 }
