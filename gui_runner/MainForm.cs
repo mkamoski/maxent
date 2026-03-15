@@ -30,14 +30,16 @@ namespace MaxEntRunner
             this.Size = new Size(1024, 768);
             this.MinimumSize = new Size(1024, 768);
             this.StartPosition = FormStartPosition.CenterScreen;
+            this.Resize += MainForm_Resize;  // Handle resize events
 
             // Script dropdown
             Label scriptLabel = new Label { Text = "Select Script:", Location = new Point(10, 10), AutoSize = true };
             scriptDropdown = new ComboBox
             {
                 Location = new Point(10, 30),
-                Size = new Size(980, 25),
-                DropDownStyle = ComboBoxStyle.DropDownList
+                Size = new Size((int)(this.ClientSize.Width * 0.9), 25),
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                DropDownWidth = 800  // Allow dropdown to be wider than the control
             };
             scriptDropdown.SelectedIndexChanged += ScriptDropdown_SelectedIndexChanged;
 
@@ -45,7 +47,7 @@ namespace MaxEntRunner
             descriptionBox = new TextBox
             {
                 Location = new Point(10, 60),
-                Size = new Size(980, 40),
+                Size = new Size((int)(this.ClientSize.Width * 0.9) - 10, 40),
                 Multiline = true,
                 ReadOnly = true,
                 BackColor = SystemColors.Control
@@ -56,7 +58,7 @@ namespace MaxEntRunner
             paramPanel = new Panel
             {
                 Location = new Point(10, 125),
-                Size = new Size(980, 120),
+                Size = new Size((int)(this.ClientSize.Width * 0.9) - 10, 120),
                 BorderStyle = BorderStyle.FixedSingle,
                 AutoScroll = true
             };
@@ -84,7 +86,7 @@ namespace MaxEntRunner
             outputBox = new RichTextBox
             {
                 Location = new Point(10, 305),
-                Size = new Size(980, 150),
+                Size = new Size((int)(this.ClientSize.Width * 0.9) - 10, 150),
                 ReadOnly = true,
                 Font = new Font("Consolas", 9),
                 BackColor = Color.Black,
@@ -96,7 +98,7 @@ namespace MaxEntRunner
             imageBox = new PictureBox
             {
                 Location = new Point(10, 480),
-                Size = new Size(980, 250),
+                Size = new Size((int)(this.ClientSize.Width * 0.9) - 10, 250),
                 BorderStyle = BorderStyle.FixedSingle,
                 SizeMode = PictureBoxSizeMode.Zoom
             };
@@ -129,9 +131,13 @@ namespace MaxEntRunner
                     return;
                 }
 
+                string baseDir = AppDomain.CurrentDomain.BaseDirectory;
                 foreach (var script in config.scripts)
                 {
-                    scriptDropdown.Items.Add(script.name);
+                    // Show full path in dropdown
+                    string fullPath = Path.GetFullPath(Path.Combine(baseDir, script.file));
+                    string displayText = $"{script.name} → {fullPath}";
+                    scriptDropdown.Items.Add(displayText);
                 }
 
                 if (scriptDropdown.Items.Count > 0)
@@ -387,6 +393,30 @@ namespace MaxEntRunner
 
             imageBox.Image?.Dispose();
             base.OnFormClosing(e);
+        }
+
+        private void MainForm_Resize(object? sender, EventArgs e)
+        {
+            // Resize controls to 90% of form width dynamically
+            int width90 = (int)(this.ClientSize.Width * 0.9);
+
+            if (scriptDropdown != null)
+            {
+                scriptDropdown.Size = new Size(width90, scriptDropdown.Height);
+                scriptDropdown.DropDownWidth = Math.Max(width90, 800);  // Minimum 800px for long paths
+            }
+
+            if (descriptionBox != null)
+                descriptionBox.Size = new Size(width90 - 10, descriptionBox.Height);
+
+            if (paramPanel != null)
+                paramPanel.Size = new Size(width90 - 10, paramPanel.Height);
+
+            if (outputBox != null)
+                outputBox.Size = new Size(width90 - 10, outputBox.Height);
+
+            if (imageBox != null)
+                imageBox.Size = new Size(width90 - 10, imageBox.Height);
         }
     }
 }
