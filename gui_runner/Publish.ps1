@@ -56,6 +56,17 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host "  Unblocking EXE..." -ForegroundColor Gray
     Unblock-File -Path $exePath -ErrorAction SilentlyContinue
 
+    # Copy ScriptConfig.json to published directory
+    Write-Host "  Copying ScriptConfig.json..." -ForegroundColor Gray
+    $sourceConfig = Join-Path (Get-Location) "ScriptConfig.json"
+    $destConfig = Join-Path $publishDir "ScriptConfig.json"
+    if (Test-Path $sourceConfig) {
+        Copy-Item $sourceConfig $destConfig -Force
+        Write-Host "  ScriptConfig.json copied!" -ForegroundColor Green
+    } else {
+        Write-Host "  WARNING: ScriptConfig.json not found in source!" -ForegroundColor Yellow
+    }
+
     Write-Host ""
     Write-Host "SUCCESS!" -ForegroundColor Green
     Write-Host ""
