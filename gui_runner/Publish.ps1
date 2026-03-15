@@ -58,15 +58,12 @@ if ($LASTEXITCODE -eq 0) {
         }
     }
 
-    # Copy script directories (exclude data/output folders)
+    # Copy script directories
     $scriptDirs = @("base", "ant", "walker", "humanoid", "cheetah", "discretized_swimmer")
     foreach ($dir in $scriptDirs) {
         $source = Join-Path $repoRoot $dir
         if (Test-Path $source) {
-            $dest = Join-Path $bundleLiteDir $dir
-
-            # Copy directory but exclude data/output folders
-            robocopy $source $dest /E /XD data figs videos logs checkpoints models __pycache__ /XF *.pyc *.log *.mp4 *.ckpt *.pkl /NDL /NJH /NJS | Out-Null
+            Copy-Item $source $bundleLiteDir -Recurse -Force
         }
     }
 
@@ -168,7 +165,7 @@ If you need Python included, download MaxEntRunner_Full.zip instead.
         Write-Host "    WARNING: venv_maxent not found!" -ForegroundColor Yellow
     }
 
-    # Copy scripts to Full bundle (exclude data/output folders)
+    # Copy scripts to Full bundle
     Write-Host "  Copying Python scripts..." -ForegroundColor Gray
     foreach ($file in $scriptFiles) {
         $source = Join-Path $repoRoot $file
@@ -180,10 +177,7 @@ If you need Python included, download MaxEntRunner_Full.zip instead.
     foreach ($dir in $scriptDirs) {
         $source = Join-Path $repoRoot $dir
         if (Test-Path $source) {
-            $dest = Join-Path $bundleFullDir $dir
-
-            # Copy directory but exclude data/output folders
-            robocopy $source $dest /E /XD data figs videos logs checkpoints models __pycache__ /XF *.pyc *.log *.mp4 *.ckpt *.pkl /NDL /NJH /NJS | Out-Null
+            Copy-Item $source $bundleFullDir -Recurse -Force
         }
     }
 
