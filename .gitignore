@@ -1,4 +1,19 @@
 # ========================================== 
+# ?? CRITICAL: ALWAYS INCLUDE THESE FILES
+# These rules OVERRIDE everything below!
+# ==========================================
+# ScriptConfig.json must ALWAYS be tracked (multiple patterns for safety)
+!ScriptConfig.json
+!**/ScriptConfig.json
+!gui_runner/ScriptConfig.json
+!gui_runner_published/ScriptConfig.json
+!MaxEntRunner_Lite/ScriptConfig.json
+!MaxEntRunner_Full/ScriptConfig.json
+# Force include distribution ZIPs
+!gui_runner_published/MaxEntRunner_Lite.zip
+!gui_runner_published/MaxEntRunner_Full.zip
+
+# ========================================== 
 # Operating System & IDE
 # ==========================================
 .vs/
@@ -52,11 +67,6 @@ htmlcov/
 # Don't commit the large EXE (users extract from ZIP or build it)
 gui_runner_published/MaxEntRunner.exe
 gui_runner_published/*.pdb
-
-# ALWAYS include these files (force include even if other rules match)
-!**/ScriptConfig.json
-!gui_runner_published/MaxEntRunner_Lite.zip
-!gui_runner_published/MaxEntRunner_Full.zip
 
 # Ignore .NET build artifacts (anywhere in repo)
 obj/

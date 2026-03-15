@@ -53,21 +53,23 @@ namespace MaxEntRunner
                 BackColor = SystemColors.Control
             };
 
-            // Parameters panel
+            // Parameters panel (25% of height)
             Label paramLabel = new Label { Text = "Parameters:", Location = new Point(10, 105), AutoSize = true };
+            int paramHeight = (int)(this.ClientSize.Height * 0.25);
             paramPanel = new Panel
             {
                 Location = new Point(10, 125),
-                Size = new Size((int)(this.ClientSize.Width * 0.9) - 10, 120),
+                Size = new Size((int)(this.ClientSize.Width * 0.9) - 10, paramHeight),
                 BorderStyle = BorderStyle.FixedSingle,
                 AutoScroll = true
             };
 
-            // Buttons
+            // Buttons (positioned after param panel)
+            int buttonY = 125 + paramHeight + 10;
             runButton = new Button
             {
                 Text = "Run Script",
-                Location = new Point(10, 250),
+                Location = new Point(10, buttonY),
                 Size = new Size(120, 30)
             };
             runButton.Click += RunButton_Click;
@@ -75,30 +77,34 @@ namespace MaxEntRunner
             viewImageButton = new Button
             {
                 Text = "View Last Output Image",
-                Location = new Point(140, 250),
+                Location = new Point(140, buttonY),
                 Size = new Size(180, 30),
                 Enabled = false
             };
             viewImageButton.Click += ViewImageButton_Click;
 
-            // Output box
-            Label outputLabel = new Label { Text = "Console Output:", Location = new Point(10, 285), AutoSize = true };
+            // Output box (25% of height, positioned after buttons)
+            int outputY = buttonY + 40;
+            Label outputLabel = new Label { Text = "Console Output:", Location = new Point(10, outputY), AutoSize = true };
+            int outputHeight = (int)(this.ClientSize.Height * 0.25);
             outputBox = new RichTextBox
             {
-                Location = new Point(10, 305),
-                Size = new Size((int)(this.ClientSize.Width * 0.9) - 10, 150),
+                Location = new Point(10, outputY + 20),
+                Size = new Size((int)(this.ClientSize.Width * 0.9) - 10, outputHeight),
                 ReadOnly = true,
                 Font = new Font("Consolas", 9),
                 BackColor = Color.Black,
                 ForeColor = Color.Lime
             };
 
-            // Image preview
-            Label imageLabel = new Label { Text = "Output Image:", Location = new Point(10, 460), AutoSize = true };
+            // Image preview (25% of height, positioned after output)
+            int imageY = outputY + 20 + outputHeight + 10;
+            Label imageLabel = new Label { Text = "Output Image:", Location = new Point(10, imageY), AutoSize = true };
+            int imageHeight = (int)(this.ClientSize.Height * 0.25);
             imageBox = new PictureBox
             {
-                Location = new Point(10, 480),
-                Size = new Size((int)(this.ClientSize.Width * 0.9) - 10, 250),
+                Location = new Point(10, imageY + 20),
+                Size = new Size((int)(this.ClientSize.Width * 0.9) - 10, imageHeight),
                 BorderStyle = BorderStyle.FixedSingle,
                 SizeMode = PictureBoxSizeMode.Zoom
             };
@@ -409,26 +415,68 @@ namespace MaxEntRunner
 
         private void MainForm_Resize(object? sender, EventArgs e)
         {
-            // Resize controls to 90% of form width dynamically
+            // Calculate dynamic dimensions (90% width, 25% height for main controls)
             int width90 = (int)(this.ClientSize.Width * 0.9);
+            int height25 = (int)(this.ClientSize.Height * 0.25);
 
+            // Horizontal resizing (already working)
             if (scriptDropdown != null)
             {
                 scriptDropdown.Size = new Size(width90, scriptDropdown.Height);
-                scriptDropdown.DropDownWidth = Math.Max(width90, 800);  // Minimum 800px for long paths
+                scriptDropdown.DropDownWidth = Math.Max(width90, 800);
             }
 
             if (descriptionBox != null)
                 descriptionBox.Size = new Size(width90 - 10, descriptionBox.Height);
 
+            // Parameters panel - 25% height + horizontal resize
             if (paramPanel != null)
-                paramPanel.Size = new Size(width90 - 10, paramPanel.Height);
+            {
+                paramPanel.Size = new Size(width90 - 10, height25);
+            }
 
+            // Reposition buttons after param panel
+            int buttonY = 125 + height25 + 10;
+            if (runButton != null)
+                runButton.Location = new Point(10, buttonY);
+            if (viewImageButton != null)
+                viewImageButton.Location = new Point(140, buttonY);
+
+            // Reposition output label and box
+            int outputY = buttonY + 40;
+            foreach (Control ctrl in this.Controls)
+            {
+                if (ctrl is Label && ctrl.Text == "Console Output:")
+                {
+                    ctrl.Location = new Point(10, outputY);
+                    break;
+                }
+            }
+
+            // Output box - 25% height + horizontal resize
             if (outputBox != null)
-                outputBox.Size = new Size(width90 - 10, outputBox.Height);
+            {
+                outputBox.Location = new Point(10, outputY + 20);
+                outputBox.Size = new Size(width90 - 10, height25);
+            }
 
+            // Reposition image label and box
+            int imageY = outputY + 20 + height25 + 10;
+            foreach (Control ctrl in this.Controls)
+            {
+                if (ctrl is Label && ctrl.Text == "Output Image:")
+                {
+                    ctrl.Location = new Point(10, imageY);
+                    break;
+                }
+            }
+
+            // Image box - 25% height + horizontal resize
             if (imageBox != null)
-                imageBox.Size = new Size(width90 - 10, imageBox.Height);
+            {
+                imageBox.Location = new Point(10, imageY + 20);
+                imageBox.Size = new Size(width90 - 10, height25);
+            }
         }
     }
 }
