@@ -131,3 +131,4 @@ plots/
 *.swo
 *~
 .cache/
+/gui_runner_published/MaxEntRunner_Full.zip
