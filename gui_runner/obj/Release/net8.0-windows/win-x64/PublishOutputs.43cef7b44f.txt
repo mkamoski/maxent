@@ -1,8 +1,0 @@
-C:\Users\mkamoski1\source\repos\maxent\gui_runner_published\MaxEntRunner.pdb
-C:\Users\mkamoski1\source\repos\maxent\gui_runner_published\ScriptConfig.json
-C:\Users\mkamoski1\source\repos\maxent\gui_runner_published\D3DCompiler_47_cor3.dll
-C:\Users\mkamoski1\source\repos\maxent\gui_runner_published\PenImc_cor3.dll
-C:\Users\mkamoski1\source\repos\maxent\gui_runner_published\PresentationNative_cor3.dll
-C:\Users\mkamoski1\source\repos\maxent\gui_runner_published\vcruntime140_cor3.dll
-C:\Users\mkamoski1\source\repos\maxent\gui_runner_published\wpfgfx_cor3.dll
-C:\Users\mkamoski1\source\repos\maxent\gui_runner_published\MaxEntRunner.exe
