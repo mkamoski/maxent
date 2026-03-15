@@ -1,0 +1,6 @@
+# Force Git to always track these files (never ignore them)
+ScriptConfig.json text eol=lf
+**/ScriptConfig.json text eol=lf
+
+# Ensure ZIPs are treated as binary
+*.zip binary
