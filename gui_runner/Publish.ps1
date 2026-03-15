@@ -12,18 +12,48 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host ""
     Write-Host "[2/2] Creating ZIP for Git..." -ForegroundColor Yellow
 
-    $exePath = "..\gui_runner_published\MaxEntRunner.exe"
-    $zipPath = "..\gui_runner_published\MaxEntRunner.zip"
+    # Use absolute paths to avoid issues
+    $publishDir = Resolve-Path "..\gui_runner_published"
+    $exePath = Join-Path $publishDir "MaxEntRunner.exe"
+    $zipPath = Join-Path $publishDir "MaxEntRunner.zip"
+
+    Write-Host "  EXE Path: $exePath" -ForegroundColor Gray
+    Write-Host "  ZIP Path: $zipPath" -ForegroundColor Gray
+
+    # Check if EXE exists
+    if (-not (Test-Path $exePath)) {
+        Write-Host ""
+        Write-Host "ERROR: MaxEntRunner.exe not found!" -ForegroundColor Red
+        exit 1
+    }
 
     # Remove old ZIP if exists
     if (Test-Path $zipPath) {
+        Write-Host "  Removing old ZIP..." -ForegroundColor Gray
         Remove-Item $zipPath -Force
     }
 
-    # Create new ZIP
-    Compress-Archive -Path $exePath -DestinationPath $zipPath -CompressionLevel Optimal
+    # Create new ZIP with error handling
+    try {
+        Write-Host "  Compressing EXE to ZIP..." -ForegroundColor Gray
+        Compress-Archive -Path $exePath -DestinationPath $zipPath -CompressionLevel Optimal -Force
+
+        # Verify ZIP was created
+        if (Test-Path $zipPath) {
+            Write-Host "  ZIP created successfully!" -ForegroundColor Green
+        } else {
+            Write-Host "  ERROR: ZIP file was not created!" -ForegroundColor Red
+            exit 1
+        }
+    }
+    catch {
+        Write-Host ""
+        Write-Host "ERROR creating ZIP: $_" -ForegroundColor Red
+        exit 1
+    }
 
     # Unblock the EXE (Windows Smart App Control)
+    Write-Host "  Unblocking EXE..." -ForegroundColor Gray
     Unblock-File -Path $exePath -ErrorAction SilentlyContinue
 
     Write-Host ""
