@@ -176,7 +176,12 @@ Too large for GitHub (400 MB). Hosted at:
 
 ### Easy Way (PowerShell Script - One-Liner)
 ```powershell
-# Main user (mkamoski1) - copy and paste this:
+# Main user (mkamoski1) - copy and paste into ps, creates both MaxEntRunner_Lite.zip (no python included) and MaxEntRunner_Full.zip (python included):
+
+cd C:\Users\mkamoski1\source\repos\maxent\gui_runner; .\Publish.ps1
+
+# or... this creates just MaxEntrunner_Lite.zip (LITE version only, no Python included):
+
 cd C:\Users\mkamoski1\source\repos\maxent\gui_runner; .\Publish.ps1
 
 # Other users - update path for your machine:
