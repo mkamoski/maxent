@@ -52,12 +52,20 @@ htmlcov/
 # Don't commit the large EXE (users extract from ZIP or build it)
 gui_runner_published/MaxEntRunner.exe
 gui_runner_published/*.pdb
-# But DO commit the ZIP (it's only 63 MB)
-!gui_runner_published/MaxEntRunner.zip
+
+# ALWAYS include these files (force include even if other rules match)
+!**/ScriptConfig.json
+!gui_runner_published/MaxEntRunner_Lite.zip
+!gui_runner_published/MaxEntRunner_Full.zip
 
 # Ignore .NET build artifacts (anywhere in repo)
 obj/
 bin/
+
+# Ignore portable distribution bundle folders (keep only the ZIPs)
+MaxEntRunner_Full/
+MaxEntRunner_Lite/
+MaxEntRunner_Portable/
 
 # ==========================================
 # Project Specific - MaxEnt Outputs
@@ -123,3 +131,4 @@ plots/
 *.swo
 *~
 .cache/
+/gui_runner_published/MaxEntRunner_Full.zip
