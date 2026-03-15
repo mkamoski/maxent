@@ -55,9 +55,9 @@ gui_runner_published/*.pdb
 # But DO commit the ZIP (it's only 63 MB)
 !gui_runner_published/MaxEntRunner.zip
 
-# Ignore .NET build artifacts
-gui_runner/obj/
-gui_runner/bin/
+# Ignore .NET build artifacts (anywhere in repo)
+obj/
+bin/
 
 # ==========================================
 # Project Specific - MaxEnt Outputs
@@ -123,20 +123,3 @@ plots/
 *.swo
 *~
 .cache/
-
-
-# ==========================================
-# TensorFlow Checkpoints
-# ==========================================
-*.pb
-*.index
-*.data-*-of-*
-
-# ==========================================
-# Generic Gym / RL Outputs
-# ==========================================
-*.mp4
-*.json
-
-/gui_runner/bin/Release/net8.0-windows/win-x64/MaxEntRunner.exe
-/gui_runner/bin/Release/net8.0-windows/win-x64/MaxEntRunner.pdb
