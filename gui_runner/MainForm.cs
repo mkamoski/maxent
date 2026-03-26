@@ -341,7 +341,16 @@ namespace MaxEntRunner
             try
             {
                 string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-                string imagePath = Path.GetFullPath(Path.Combine(baseDir, script.outputImage));
+                string maxentRoot = Path.GetFullPath(Path.Combine(baseDir, ".."));
+
+                // Look for image in working directory first (where scripts run)
+                string imagePath = Path.GetFullPath(Path.Combine(maxentRoot, script.outputImage));
+
+                // Fallback: try relative to EXE location
+                if (!File.Exists(imagePath))
+                {
+                    imagePath = Path.GetFullPath(Path.Combine(baseDir, script.outputImage));
+                }
 
                 if (File.Exists(imagePath))
                 {
