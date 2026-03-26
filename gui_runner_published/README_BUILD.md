@@ -175,6 +175,7 @@ Too large for GitHub (400 MB). Hosted at:
 **If you prefer to build from source:**
 
 ### Easy Way (PowerShell Script - One-Liner)
+
 ```powershell
 # Main user (mkamoski1) - copy and paste into ps, creates both MaxEntRunner_Lite.zip (no python included) and MaxEntRunner_Full.zip (python included):
 
