@@ -1,5 +1,8 @@
 # Efficient Maximum-Entropy Exploration
 
+**THIS IS MY CLONE OF THE ORIGINAL MAXENT PROJECT, WITH MY MODIFICATIONS TO GET IT TO RUN IN 2026, BECAUSE I DO NOT HAVE WRITE ACCESS TO THE ORIGINAL REPO**
+
+
 This is the experimental repository for entropy-based exploration: the MAXENT algorithm
 
 MAXENT is a new algorithm to encourage efficient discovery of an unknown state space in RL problems: https://arxiv.org/abs/1812.02690
