@@ -1,5 +1,5 @@
-# MaxEnt Script Runner - Build TWO Portable Distributions
-# Creates FULL (with Python) and LITE (scripts only) versions
+# MaxEnt Script Runner - Build TWO Portable Distributions.
+# Creates FULL (with Python) and LITE (scripts only) versions.
 
 Write-Host "Building Portable MaxEnt Script Runner..." -ForegroundColor Cyan
 Write-Host ""
