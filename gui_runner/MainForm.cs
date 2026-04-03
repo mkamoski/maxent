@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
 
@@ -7,10 +8,13 @@ namespace MaxEntRunner
     public partial class MainForm : Form
     {
         private ScriptConfig? config;
+        private Label scriptLabel = null!;
         private ComboBox scriptDropdown = null!;
         private TextBox descriptionBox = null!;
+        private Label paramLabel = null!;
         private Panel paramPanel = null!;
         private Dictionary<string, TextBox> paramTextBoxes = new();
+        private FlowLayoutPanel buttonPanel = null!;
         private Button runButton = null!;
         private Button stopButton = null!;
         private Button viewImageButton = null!;
@@ -22,6 +26,9 @@ namespace MaxEntRunner
         private ComboBox timeoutDropdown = null!;
         private Label documentationLabel = null!;
         private ComboBox documentationDropdown = null!;
+        private Label buildInfoLabel = null!;
+        private Label outputLabel = null!;
+        private Label imageLabel = null!;
         private RichTextBox outputBox = null!;
         private PictureBox imageBox = null!;
         private Process? currentProcess;
@@ -45,7 +52,8 @@ namespace MaxEntRunner
             this.Resize += MainForm_Resize;  // Handle resize events
 
             // Script dropdown
-            Label scriptLabel = new Label { Text = "Select Script:", Location = new Point(10, 10), AutoSize = true };
+            scriptLabel = new Label { Text = "Select Script:", AutoSize = true };
+            buildInfoLabel = new Label { Text = "Last built: unknown", Location = new Point(10, 10), AutoSize = true };
             scriptDropdown = new ComboBox
             {
                 Location = new Point(10, 30),
@@ -54,6 +62,7 @@ namespace MaxEntRunner
                 DropDownWidth = 800  // Allow dropdown to be wider than the control
             };
             scriptDropdown.SelectedIndexChanged += ScriptDropdown_SelectedIndexChanged;
+            scriptDropdown.DropDownWidth = Math.Max(scriptDropdown.Width, 800);
 
             // Description box
             descriptionBox = new TextBox
@@ -66,39 +75,42 @@ namespace MaxEntRunner
             };
 
             // Parameters panel (25% of height)
-            documentationLabel = new Label { Text = "Documentation:", Location = new Point(10, 105), AutoSize = true };
+            documentationLabel = new Label { Text = "Documentation:", AutoSize = true };
             documentationDropdown = new ComboBox
             {
-                Location = new Point(10, 125),
-                Size = new Size((int)(this.ClientSize.Width * 0.9), 25),
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
             documentationDropdown.SelectedIndexChanged += DocumentationDropdown_SelectedIndexChanged;
-            Label paramLabel = new Label { Text = "Parameters:", Location = new Point(10, 155), AutoSize = true };
-            int paramHeight = (int)(this.ClientSize.Height * 0.25);
+            paramLabel = new Label { Text = "Parameters:", AutoSize = true };
+            int paramHeight = (int)(this.ClientSize.Height * 0.2);
             paramPanel = new Panel
             {
-                Location = new Point(10, 175),
-                Size = new Size((int)(this.ClientSize.Width * 0.9) - 10, paramHeight),
                 BorderStyle = BorderStyle.FixedSingle,
                 AutoScroll = true
             };
 
             // Buttons (positioned after param panel)
             int buttonY = 175 + paramHeight + 10;
+            buttonPanel = new FlowLayoutPanel
+            {
+                AutoSize = false,
+                WrapContents = false,
+                FlowDirection = FlowDirection.LeftToRight
+            };
+
             runButton = new Button
             {
                 Text = "Run Script",
-                Location = new Point(10, buttonY),
-                Size = new Size(120, 30)
+                AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink
             };
             runButton.Click += RunButton_Click;
 
             stopButton = new Button
             {
                 Text = "Stop Script",
-                Location = new Point(140, buttonY),
-                Size = new Size(100, 30),
+                AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink,
                 Enabled = false
             };
             stopButton.Click += StopButton_Click;
@@ -106,8 +118,8 @@ namespace MaxEntRunner
             viewImageButton = new Button
             {
                 Text = "View Last Output Image",
-                Location = new Point(250, buttonY),
-                Size = new Size(180, 30),
+                AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink,
                 Enabled = false
             };
             viewImageButton.Click += ViewImageButton_Click;
@@ -115,45 +127,44 @@ namespace MaxEntRunner
             selectAllButton = new Button
             {
                 Text = "Select All Output",
-                Location = new Point(440, buttonY),
-                Size = new Size(100, 30)
+                AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink
             };
             selectAllButton.Click += SelectAllButton_Click;
 
             copyButton = new Button
             {
                 Text = "Copy Selected Output",
-                Location = new Point(550, buttonY),
-                Size = new Size(100, 30)
+                AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink
             };
             copyButton.Click += CopyButton_Click;
 
             saveOutputButton = new Button
             {
                 Text = "Save Output",
-                Location = new Point(660, buttonY),
-                Size = new Size(120, 30)
+                AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink
             };
             saveOutputButton.Click += SaveOutputButton_Click;
 
             openOutputButton = new Button
             {
                 Text = "Open Output",
-                Location = new Point(790, buttonY),
-                Size = new Size(120, 30)
+                AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink
             };
             openOutputButton.Click += OpenOutputButton_Click;
 
             timeoutLabel = new Label
             {
                 Text = "Stop if running > (minutes)",
-                Location = new Point(790, buttonY + 6),
-                AutoSize = true
+                AutoSize = true,
+                Margin = new Padding(10, 6, 0, 0)
             };
 
             timeoutDropdown = new ComboBox
             {
-                Location = new Point(915, buttonY + 3),
                 Size = new Size(80, 25),
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
@@ -167,13 +178,10 @@ namespace MaxEntRunner
             runTimer.Tick += RunTimer_Tick;
 
             // Output box (25% of height, positioned after buttons)
-            int outputY = buttonY + 40;
-            Label outputLabel = new Label { Text = "Console Output:", Location = new Point(10, outputY), AutoSize = true };
-            int outputHeight = (int)(this.ClientSize.Height * 0.25);
+            outputLabel = new Label { Text = "Console Output:", AutoSize = true };
+            int outputHeight = (int)(this.ClientSize.Height * 0.2);
             outputBox = new RichTextBox
             {
-                Location = new Point(10, outputY + 20),
-                Size = new Size((int)(this.ClientSize.Width * 0.9) - 10, outputHeight),
                 ReadOnly = true,
                 Font = new Font("Consolas", 9),
                 BackColor = Color.Black,
@@ -181,18 +189,26 @@ namespace MaxEntRunner
             };
 
             // Image preview (25% of height, positioned after output)
-            int imageY = outputY + 20 + outputHeight + 10;
-            Label imageLabel = new Label { Text = "Output Image:", Location = new Point(10, imageY), AutoSize = true };
-            int imageHeight = (int)(this.ClientSize.Height * 0.25);
+            imageLabel = new Label { Text = "Output Image:", AutoSize = true };
+            int imageHeight = (int)(this.ClientSize.Height * 0.2);
             imageBox = new PictureBox
             {
-                Location = new Point(10, imageY + 20),
-                Size = new Size((int)(this.ClientSize.Width * 0.9) - 10, imageHeight),
                 BorderStyle = BorderStyle.FixedSingle,
                 SizeMode = PictureBoxSizeMode.Zoom
             };
 
+            buttonPanel.Controls.Add(runButton);
+            buttonPanel.Controls.Add(stopButton);
+            buttonPanel.Controls.Add(viewImageButton);
+            buttonPanel.Controls.Add(selectAllButton);
+            buttonPanel.Controls.Add(copyButton);
+            buttonPanel.Controls.Add(saveOutputButton);
+            buttonPanel.Controls.Add(openOutputButton);
+            buttonPanel.Controls.Add(timeoutLabel);
+            buttonPanel.Controls.Add(timeoutDropdown);
+
             // Add controls
+            this.Controls.Add(buildInfoLabel);
             this.Controls.Add(scriptLabel);
             this.Controls.Add(scriptDropdown);
             this.Controls.Add(descriptionBox);
@@ -200,19 +216,86 @@ namespace MaxEntRunner
             this.Controls.Add(documentationLabel);
             this.Controls.Add(documentationDropdown);
             this.Controls.Add(paramPanel);
-            this.Controls.Add(runButton);
-            this.Controls.Add(stopButton);
-            this.Controls.Add(viewImageButton);
-            this.Controls.Add(selectAllButton);
-            this.Controls.Add(copyButton);
-            this.Controls.Add(saveOutputButton);
-            this.Controls.Add(openOutputButton);
-            this.Controls.Add(timeoutLabel);
-            this.Controls.Add(timeoutDropdown);
+            this.Controls.Add(buttonPanel);
             this.Controls.Add(outputLabel);
             this.Controls.Add(outputBox);
             this.Controls.Add(imageLabel);
             this.Controls.Add(imageBox);
+
+            UpdateBuildInfoLabel();
+            LayoutControls();
+        }
+
+        private void UpdateBuildInfoLabel()
+        {
+            try
+            {
+                string exePath = Assembly.GetExecutingAssembly().Location;
+                DateTime lastBuilt = File.GetLastWriteTime(exePath);
+                buildInfoLabel.Text = $"Last built: {lastBuilt:yyyy-MM-dd HH:mm:ss}";
+            }
+            catch
+            {
+                buildInfoLabel.Text = "Last built: unknown";
+            }
+        }
+
+        private void LayoutControls()
+        {
+            int width90 = (int)(this.ClientSize.Width * 0.9);
+            int height25 = (int)(this.ClientSize.Height * 0.2);
+            int lineGap = TextRenderer.MeasureText("A", this.Font).Height;
+            int x = 10;
+            int y = 10 + lineGap;
+
+            buildInfoLabel.Location = new Point(x, y);
+            y += buildInfoLabel.Height + lineGap;
+
+            scriptLabel.Location = new Point(x, y);
+            y += scriptLabel.Height + 4;
+
+            scriptDropdown.Location = new Point(x, y);
+            scriptDropdown.Size = new Size(width90, scriptDropdown.Height);
+            y += scriptDropdown.Height + lineGap;
+
+            descriptionBox.Location = new Point(x, y);
+            descriptionBox.Size = new Size(width90 - 10, descriptionBox.Height);
+            y += descriptionBox.Height + lineGap;
+
+            documentationLabel.Location = new Point(x, y);
+            y += documentationLabel.Height + 4;
+
+            documentationDropdown.Location = new Point(x, y);
+            documentationDropdown.Size = new Size(width90, documentationDropdown.Height);
+            y += documentationDropdown.Height + lineGap;
+
+            paramLabel.Location = new Point(x, y);
+            y += paramLabel.Height + 4;
+
+            paramPanel.Location = new Point(x, y);
+            paramPanel.Size = new Size(width90 - 10, height25);
+            y += paramPanel.Height + lineGap;
+
+            buttonPanel.Location = new Point(x, y);
+            int buttonHeight = Math.Max(runButton.Height, stopButton.Height) + 8;
+            buttonPanel.Size = new Size(width90, buttonHeight);
+            y += buttonPanel.Height + lineGap;
+
+            outputLabel.Location = new Point(x, y);
+            y += outputLabel.Height + 4;
+
+            int remainingHeight = this.ClientSize.Height - y - (outputLabel.Height + 4) - (imageLabel.Height + 4) - lineGap;
+            int boxHeight = Math.Max(80, remainingHeight / 2);
+
+            outputBox.Location = new Point(x, y);
+            outputBox.Size = new Size(width90 - 10, boxHeight);
+            y += outputBox.Height + lineGap;
+
+            imageLabel.Location = new Point(x, y);
+            y += imageLabel.Height + 4;
+
+            imageBox.Location = new Point(x, y);
+            imageBox.Size = new Size(width90 - 10, boxHeight);
         }
 
         private string FindRepoRoot()
@@ -581,7 +664,7 @@ namespace MaxEntRunner
 
         private string SaveOutputToFile()
         {
-            string timestamp = DateTime.Now.ToString("yyyy-MM-dd-HHmm-ss.fff");
+            string timestamp = DateTime.Now.ToString("yyyy-MM-dd-HHmm-ss-fff");
             string fileName = $"maxent-output={timestamp}.txt";
             string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
             File.WriteAllText(filePath, outputBox.Text, Encoding.UTF8);
@@ -726,99 +809,7 @@ namespace MaxEntRunner
 
         private void MainForm_Resize(object? sender, EventArgs e)
         {
-            // Calculate dynamic dimensions (90% width, 25% height for main controls)
-            int width90 = (int)(this.ClientSize.Width * 0.9);
-            int height25 = (int)(this.ClientSize.Height * 0.25);
-
-            // Horizontal resizing (already working)
-            if (scriptDropdown != null)
-            {
-                scriptDropdown.Size = new Size(width90, scriptDropdown.Height);
-                scriptDropdown.DropDownWidth = Math.Max(width90, 800);
-            }
-
-            if (descriptionBox != null)
-                descriptionBox.Size = new Size(width90 - 10, descriptionBox.Height);
-
-            // Parameters panel - 25% height + horizontal resize
-            if (paramPanel != null)
-            {
-                paramPanel.Size = new Size(width90 - 10, height25);
-            }
-
-            if (documentationLabel != null)
-                documentationLabel.Location = new Point(10, 105);
-            if (documentationDropdown != null)
-            {
-                documentationDropdown.Location = new Point(10, 125);
-                documentationDropdown.Size = new Size(width90, documentationDropdown.Height);
-            }
-
-            foreach (Control ctrl in this.Controls)
-            {
-                if (ctrl is Label && ctrl.Text == "Parameters:")
-                {
-                    ctrl.Location = new Point(10, 155);
-                    break;
-                }
-            }
-
-            // Reposition buttons after param panel
-            int buttonY = 175 + height25 + 10;
-            if (runButton != null)
-                runButton.Location = new Point(10, buttonY);
-            if (stopButton != null)
-                stopButton.Location = new Point(140, buttonY);
-            if (viewImageButton != null)
-                viewImageButton.Location = new Point(250, buttonY);
-            if (selectAllButton != null)
-                selectAllButton.Location = new Point(440, buttonY);
-            if (copyButton != null)
-                copyButton.Location = new Point(550, buttonY);
-            if (saveOutputButton != null)
-                saveOutputButton.Location = new Point(660, buttonY);
-            if (openOutputButton != null)
-                openOutputButton.Location = new Point(790, buttonY);
-            if (timeoutLabel != null)
-                timeoutLabel.Location = new Point(920, buttonY + 6);
-            if (timeoutDropdown != null)
-                timeoutDropdown.Location = new Point(1045, buttonY + 3);
-
-            // Reposition output label and box
-            int outputY = buttonY + 40;
-            foreach (Control ctrl in this.Controls)
-            {
-                if (ctrl is Label && ctrl.Text == "Console Output:")
-                {
-                    ctrl.Location = new Point(10, outputY);
-                    break;
-                }
-            }
-
-            // Output box - 25% height + horizontal resize
-            if (outputBox != null)
-            {
-                outputBox.Location = new Point(10, outputY + 20);
-                outputBox.Size = new Size(width90 - 10, height25);
-            }
-
-            // Reposition image label and box
-            int imageY = outputY + 20 + height25 + 10;
-            foreach (Control ctrl in this.Controls)
-            {
-                if (ctrl is Label && ctrl.Text == "Output Image:")
-                {
-                    ctrl.Location = new Point(10, imageY);
-                    break;
-                }
-            }
-
-            // Image box - 25% height + horizontal resize
-            if (imageBox != null)
-            {
-                imageBox.Location = new Point(10, imageY + 20);
-                imageBox.Size = new Size(width90 - 10, height25);
-            }
+            LayoutControls();
         }
     }
 }

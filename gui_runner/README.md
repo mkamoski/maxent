@@ -53,6 +53,9 @@ Tested on:
 - **System SKU:** LENOVO_MT_82HU_BU_idea_FM_IdeaPad Flex 5 14ALC05
 - **OS:** Windows 11
 - **RAM:** 16 GB
+- **Minimum resolution:** 1920x1080
+
+Used for coding and testing on this machine.
 
 Use this as a baseline for expected performance and timeouts.
 
