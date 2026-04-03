@@ -14,7 +14,11 @@ https://arxiv.org/abs/1812.02690
 
 This repo contains the experimental code for various OpenAI/Mujoco environments: Swimmer, Ant, HalfCheetah, Walker2d, and Humanoid. The stable code for two classic control tasks is in a different repo: 
 
+See...
+
 https://github.com/abbyvansoest/maxent_base
+
+https://github.com/abbyvansoest/maxent
 
 All implemetations use a forked copy of OpenAI Gym available at: https://github.com/abbyvansoest/gym-fork. Changes were made to the graphics used for rendering and the behavior of state reseting.
 
