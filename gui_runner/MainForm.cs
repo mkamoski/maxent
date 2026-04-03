@@ -12,12 +12,21 @@ namespace MaxEntRunner
         private Panel paramPanel = null!;
         private Dictionary<string, TextBox> paramTextBoxes = new();
         private Button runButton = null!;
+        private Button stopButton = null!;
         private Button viewImageButton = null!;
         private Button selectAllButton = null!;
         private Button copyButton = null!;
+        private Button saveOutputButton = null!;
+        private Button openOutputButton = null!;
+        private Label timeoutLabel = null!;
+        private ComboBox timeoutDropdown = null!;
+        private Label documentationLabel = null!;
+        private ComboBox documentationDropdown = null!;
         private RichTextBox outputBox = null!;
         private PictureBox imageBox = null!;
         private Process? currentProcess;
+        private DateTime? runStartTime;
+        private System.Windows.Forms.Timer runTimer = null!;
 
         public MainForm()
         {
@@ -57,18 +66,26 @@ namespace MaxEntRunner
             };
 
             // Parameters panel (25% of height)
-            Label paramLabel = new Label { Text = "Parameters:", Location = new Point(10, 105), AutoSize = true };
+            documentationLabel = new Label { Text = "Documentation:", Location = new Point(10, 105), AutoSize = true };
+            documentationDropdown = new ComboBox
+            {
+                Location = new Point(10, 125),
+                Size = new Size((int)(this.ClientSize.Width * 0.9), 25),
+                DropDownStyle = ComboBoxStyle.DropDownList
+            };
+            documentationDropdown.SelectedIndexChanged += DocumentationDropdown_SelectedIndexChanged;
+            Label paramLabel = new Label { Text = "Parameters:", Location = new Point(10, 155), AutoSize = true };
             int paramHeight = (int)(this.ClientSize.Height * 0.25);
             paramPanel = new Panel
             {
-                Location = new Point(10, 125),
+                Location = new Point(10, 175),
                 Size = new Size((int)(this.ClientSize.Width * 0.9) - 10, paramHeight),
                 BorderStyle = BorderStyle.FixedSingle,
                 AutoScroll = true
             };
 
             // Buttons (positioned after param panel)
-            int buttonY = 125 + paramHeight + 10;
+            int buttonY = 175 + paramHeight + 10;
             runButton = new Button
             {
                 Text = "Run Script",
@@ -77,10 +94,19 @@ namespace MaxEntRunner
             };
             runButton.Click += RunButton_Click;
 
+            stopButton = new Button
+            {
+                Text = "Stop Script",
+                Location = new Point(140, buttonY),
+                Size = new Size(100, 30),
+                Enabled = false
+            };
+            stopButton.Click += StopButton_Click;
+
             viewImageButton = new Button
             {
                 Text = "View Last Output Image",
-                Location = new Point(140, buttonY),
+                Location = new Point(250, buttonY),
                 Size = new Size(180, 30),
                 Enabled = false
             };
@@ -88,19 +114,57 @@ namespace MaxEntRunner
 
             selectAllButton = new Button
             {
-                Text = "Select All",
-                Location = new Point(330, buttonY),
+                Text = "Select All Output",
+                Location = new Point(440, buttonY),
                 Size = new Size(100, 30)
             };
             selectAllButton.Click += SelectAllButton_Click;
 
             copyButton = new Button
             {
-                Text = "Copy",
-                Location = new Point(440, buttonY),
+                Text = "Copy Selected Output",
+                Location = new Point(550, buttonY),
                 Size = new Size(100, 30)
             };
             copyButton.Click += CopyButton_Click;
+
+            saveOutputButton = new Button
+            {
+                Text = "Save Output",
+                Location = new Point(660, buttonY),
+                Size = new Size(120, 30)
+            };
+            saveOutputButton.Click += SaveOutputButton_Click;
+
+            openOutputButton = new Button
+            {
+                Text = "Open Output",
+                Location = new Point(790, buttonY),
+                Size = new Size(120, 30)
+            };
+            openOutputButton.Click += OpenOutputButton_Click;
+
+            timeoutLabel = new Label
+            {
+                Text = "Stop if running > (minutes)",
+                Location = new Point(790, buttonY + 6),
+                AutoSize = true
+            };
+
+            timeoutDropdown = new ComboBox
+            {
+                Location = new Point(915, buttonY + 3),
+                Size = new Size(80, 25),
+                DropDownStyle = ComboBoxStyle.DropDownList
+            };
+            timeoutDropdown.Items.AddRange(new object[] { "15", "30", "45", "60", "75", "90", "105", "120" });
+            timeoutDropdown.SelectedIndex = 1;
+
+            runTimer = new System.Windows.Forms.Timer
+            {
+                Interval = 5000
+            };
+            runTimer.Tick += RunTimer_Tick;
 
             // Output box (25% of height, positioned after buttons)
             int outputY = buttonY + 40;
@@ -133,11 +197,18 @@ namespace MaxEntRunner
             this.Controls.Add(scriptDropdown);
             this.Controls.Add(descriptionBox);
             this.Controls.Add(paramLabel);
+            this.Controls.Add(documentationLabel);
+            this.Controls.Add(documentationDropdown);
             this.Controls.Add(paramPanel);
             this.Controls.Add(runButton);
+            this.Controls.Add(stopButton);
             this.Controls.Add(viewImageButton);
             this.Controls.Add(selectAllButton);
             this.Controls.Add(copyButton);
+            this.Controls.Add(saveOutputButton);
+            this.Controls.Add(openOutputButton);
+            this.Controls.Add(timeoutLabel);
+            this.Controls.Add(timeoutDropdown);
             this.Controls.Add(outputLabel);
             this.Controls.Add(outputBox);
             this.Controls.Add(imageLabel);
@@ -199,10 +270,69 @@ namespace MaxEntRunner
 
                 if (scriptDropdown.Items.Count > 0)
                     scriptDropdown.SelectedIndex = 0;
+
+                LoadDocumentationList();
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error loading config: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private sealed class DocItem
+        {
+            public string Name { get; }
+            public string Path { get; }
+
+            public DocItem(string name, string path)
+            {
+                Name = name;
+                Path = path;
+            }
+
+            public override string ToString() => $"{Name} -- {Path}";
+        }
+
+        private void LoadDocumentationList()
+        {
+            documentationDropdown.Items.Clear();
+            string repoRoot = FindRepoRoot();
+            var files = Directory.GetFiles(repoRoot, "*.md", SearchOption.AllDirectories)
+                .Where(path => !path.Contains("\\venv_maxent\\", StringComparison.OrdinalIgnoreCase)
+                            && !path.Contains("\\python\\", StringComparison.OrdinalIgnoreCase)
+                            && !path.Contains("\\.git\\", StringComparison.OrdinalIgnoreCase)
+                            && !path.Contains("\\MaxEntRunner_", StringComparison.OrdinalIgnoreCase))
+                .OrderBy(path => Path.GetFileName(path), StringComparer.OrdinalIgnoreCase)
+                .ThenBy(path => path, StringComparer.OrdinalIgnoreCase);
+
+            foreach (var file in files)
+            {
+                documentationDropdown.Items.Add(new DocItem(Path.GetFileName(file), file));
+            }
+
+            documentationDropdown.SelectedIndex = -1;
+        }
+
+        private void DocumentationDropdown_SelectedIndexChanged(object? sender, EventArgs e)
+        {
+            if (documentationDropdown.SelectedItem is not DocItem doc) return;
+
+            AppendOutput($"\nDocumentation selected: {doc.Path}\n", Color.Cyan);
+
+            try
+            {
+                Process.Start(new ProcessStartInfo("notepad++", $"\"{doc.Path}\"") { UseShellExecute = true });
+            }
+            catch
+            {
+                try
+                {
+                    Process.Start(new ProcessStartInfo("notepad", $"\"{doc.Path}\"") { UseShellExecute = true });
+                }
+                catch
+                {
+                    MessageBox.Show($"Failed to open documentation: {doc.Path}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
@@ -255,8 +385,13 @@ namespace MaxEntRunner
             try
             {
                 runButton.Enabled = false;
+                stopButton.Enabled = true;
                 outputBox.Clear();
                 imageBox.Image = null;
+
+                runStartTime = DateTime.Now;
+                AppendOutput($"Start Time: {runStartTime:HH:mm:ss}\n", Color.Cyan);
+                runTimer.Start();
 
                 AppendOutput($"=== Starting: {script.name} ===\n", Color.Yellow);
 
@@ -306,6 +441,8 @@ namespace MaxEntRunner
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     CreateNoWindow = true,
+                    StandardOutputEncoding = Encoding.UTF8,
+                    StandardErrorEncoding = Encoding.UTF8,
                     WorkingDirectory = maxentRoot  // Changed: use maxent root, not script dir
                 };
 
@@ -315,6 +452,9 @@ namespace MaxEntRunner
 
                 // Fix Unicode encoding for Windows console
                 startInfo.EnvironmentVariables["PYTHONIOENCODING"] = "utf-8";
+                // Silence CUDA/GPU warnings on machines without GPU drivers
+                startInfo.EnvironmentVariables["CUDA_VISIBLE_DEVICES"] = "-1";
+                startInfo.EnvironmentVariables["TF_CPP_MIN_LOG_LEVEL"] = "2";
 
                 AppendOutput($"Command: {pythonPath} {args}\n", Color.Cyan);
                 AppendOutput($"Working Dir: {startInfo.WorkingDirectory}\n\n", Color.Cyan);
@@ -368,6 +508,15 @@ namespace MaxEntRunner
                 {
                     AppendOutput($"\n=== FAILED (Exit Code: {exitCode}) ===\n", Color.Red);
                 }
+
+                if (runStartTime.HasValue)
+                {
+                    DateTime finishTime = DateTime.Now;
+                    TimeSpan elapsed = finishTime - runStartTime.Value;
+                    AppendOutput($"\nStart:  {runStartTime:HH:mm:ss}\n", Color.Cyan);
+                    AppendOutput($"Finish: {finishTime:HH:mm:ss}\n", Color.Cyan);
+                    AppendOutput($"Elapsed: {elapsed:hh\\:mm\\:ss}\n", Color.Cyan);
+                }
             }
             catch (Exception ex)
             {
@@ -376,8 +525,15 @@ namespace MaxEntRunner
             finally
             {
                 runButton.Enabled = true;
+                stopButton.Enabled = false;
                 currentProcess = null;
+                runTimer.Stop();
             }
+        }
+
+        private void StopButton_Click(object? sender, EventArgs e)
+        {
+            ForceStopCurrentProcess("User requested stop");
         }
 
         private void SelectAllButton_Click(object? sender, EventArgs e)
@@ -392,6 +548,94 @@ namespace MaxEntRunner
             if (!string.IsNullOrEmpty(text))
             {
                 Clipboard.SetDataObject(new DataObject(DataFormats.UnicodeText, text), true);
+            }
+        }
+
+        private void SaveOutputButton_Click(object? sender, EventArgs e)
+        {
+            string filePath = SaveOutputToFile();
+            AppendOutput($"\nOutput saved: {filePath}\n", Color.Cyan);
+        }
+
+        private void OpenOutputButton_Click(object? sender, EventArgs e)
+        {
+            string filePath = SaveOutputToFile();
+            AppendOutput($"\nOutput saved: {filePath}\n", Color.Cyan);
+
+            try
+            {
+                Process.Start(new ProcessStartInfo("notepad++", $"\"{filePath}\"") { UseShellExecute = true });
+            }
+            catch
+            {
+                try
+                {
+                    Process.Start(new ProcessStartInfo("notepad", $"\"{filePath}\"") { UseShellExecute = true });
+                }
+                catch
+                {
+                    AppendOutput("Failed to open the output file in an editor.\n", Color.Yellow);
+                }
+            }
+        }
+
+        private string SaveOutputToFile()
+        {
+            string timestamp = DateTime.Now.ToString("yyyy-MM-dd-HHmm-ss.fff");
+            string fileName = $"maxent-output={timestamp}.txt";
+            string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
+            File.WriteAllText(filePath, outputBox.Text, Encoding.UTF8);
+            return filePath;
+        }
+
+        private void RunTimer_Tick(object? sender, EventArgs e)
+        {
+            if (!runStartTime.HasValue || currentProcess == null || currentProcess.HasExited) return;
+
+            int timeoutMinutes = GetTimeoutMinutes();
+            if (timeoutMinutes <= 0) return;
+
+            TimeSpan elapsed = DateTime.Now - runStartTime.Value;
+            if (elapsed.TotalMinutes > timeoutMinutes)
+            {
+                ForceStopCurrentProcess($"Timeout after {timeoutMinutes} minutes");
+            }
+        }
+
+        private int GetTimeoutMinutes()
+        {
+            if (timeoutDropdown.SelectedItem == null) return 0;
+            if (!int.TryParse(timeoutDropdown.SelectedItem.ToString(), out int minutes)) return 0;
+            return Math.Clamp(minutes, 15, 120);
+        }
+
+        private void ForceStopCurrentProcess(string reason)
+        {
+            if (currentProcess == null || currentProcess.HasExited) return;
+
+            AppendOutput($"\n{reason}. Terminating process...\n", Color.Red);
+
+            try
+            {
+                int pid = currentProcess.Id;
+                currentProcess.Kill(true);
+                try
+                {
+                    var killInfo = new ProcessStartInfo("taskkill", $"/PID {pid} /T /F")
+                    {
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
+                    Process.Start(killInfo)?.Dispose();
+                }
+                catch
+                {
+                    // Ignore taskkill errors
+                }
+            }
+            catch (Exception ex)
+            {
+                AppendOutput($"Failed to terminate process: {ex.Message}\n", Color.Yellow);
             }
         }
 
@@ -436,7 +680,7 @@ namespace MaxEntRunner
                     imageBox.Image?.Dispose();
                     imageBox.Image = Image.FromStream(fs);
                 }
-                AppendOutput($"Image loaded: {Path.GetFileName(path)}\n", Color.Cyan);
+                AppendOutput($"Image loaded: {path}\n", Color.Cyan);
             }
             catch (Exception ex)
             {
@@ -502,16 +746,43 @@ namespace MaxEntRunner
                 paramPanel.Size = new Size(width90 - 10, height25);
             }
 
+            if (documentationLabel != null)
+                documentationLabel.Location = new Point(10, 105);
+            if (documentationDropdown != null)
+            {
+                documentationDropdown.Location = new Point(10, 125);
+                documentationDropdown.Size = new Size(width90, documentationDropdown.Height);
+            }
+
+            foreach (Control ctrl in this.Controls)
+            {
+                if (ctrl is Label && ctrl.Text == "Parameters:")
+                {
+                    ctrl.Location = new Point(10, 155);
+                    break;
+                }
+            }
+
             // Reposition buttons after param panel
-            int buttonY = 125 + height25 + 10;
+            int buttonY = 175 + height25 + 10;
             if (runButton != null)
                 runButton.Location = new Point(10, buttonY);
+            if (stopButton != null)
+                stopButton.Location = new Point(140, buttonY);
             if (viewImageButton != null)
-                viewImageButton.Location = new Point(140, buttonY);
+                viewImageButton.Location = new Point(250, buttonY);
             if (selectAllButton != null)
-                selectAllButton.Location = new Point(330, buttonY);
+                selectAllButton.Location = new Point(440, buttonY);
             if (copyButton != null)
-                copyButton.Location = new Point(440, buttonY);
+                copyButton.Location = new Point(550, buttonY);
+            if (saveOutputButton != null)
+                saveOutputButton.Location = new Point(660, buttonY);
+            if (openOutputButton != null)
+                openOutputButton.Location = new Point(790, buttonY);
+            if (timeoutLabel != null)
+                timeoutLabel.Location = new Point(920, buttonY + 6);
+            if (timeoutDropdown != null)
+                timeoutDropdown.Location = new Point(1045, buttonY + 3);
 
             // Reposition output label and box
             int outputY = buttonY + 40;
