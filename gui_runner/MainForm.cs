@@ -13,6 +13,8 @@ namespace MaxEntRunner
         private Dictionary<string, TextBox> paramTextBoxes = new();
         private Button runButton = null!;
         private Button viewImageButton = null!;
+        private Button selectAllButton = null!;
+        private Button copyButton = null!;
         private RichTextBox outputBox = null!;
         private PictureBox imageBox = null!;
         private Process? currentProcess;
@@ -30,6 +32,7 @@ namespace MaxEntRunner
             this.Size = new Size(1024, 768);
             this.MinimumSize = new Size(1024, 768);
             this.StartPosition = FormStartPosition.CenterScreen;
+            this.WindowState = FormWindowState.Maximized;  // Maximize at startup
             this.Resize += MainForm_Resize;  // Handle resize events
 
             // Script dropdown
@@ -83,6 +86,22 @@ namespace MaxEntRunner
             };
             viewImageButton.Click += ViewImageButton_Click;
 
+            selectAllButton = new Button
+            {
+                Text = "Select All",
+                Location = new Point(330, buttonY),
+                Size = new Size(100, 30)
+            };
+            selectAllButton.Click += SelectAllButton_Click;
+
+            copyButton = new Button
+            {
+                Text = "Copy",
+                Location = new Point(440, buttonY),
+                Size = new Size(100, 30)
+            };
+            copyButton.Click += CopyButton_Click;
+
             // Output box (25% of height, positioned after buttons)
             int outputY = buttonY + 40;
             Label outputLabel = new Label { Text = "Console Output:", Location = new Point(10, outputY), AutoSize = true };
@@ -117,10 +136,42 @@ namespace MaxEntRunner
             this.Controls.Add(paramPanel);
             this.Controls.Add(runButton);
             this.Controls.Add(viewImageButton);
+            this.Controls.Add(selectAllButton);
+            this.Controls.Add(copyButton);
             this.Controls.Add(outputLabel);
             this.Controls.Add(outputBox);
             this.Controls.Add(imageLabel);
             this.Controls.Add(imageBox);
+        }
+
+        private string FindRepoRoot()
+        {
+            string dir = AppDomain.CurrentDomain.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar);
+            while (!string.IsNullOrEmpty(dir))
+            {
+                if (Directory.Exists(Path.Combine(dir, "venv_maxent")) ||
+                    Directory.Exists(Path.Combine(dir, "python")) ||
+                    File.Exists(Path.Combine(dir, "demo_simple_cartpole.py")))
+                {
+                    return dir;
+                }
+                string? parent = Path.GetDirectoryName(dir);
+                if (parent == null || parent == dir) break;
+                dir = parent;
+            }
+            return Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ".."));
+        }
+
+        private string ResolvePath(string baseDir, string relativePath, string repoRoot)
+        {
+            string primary = Path.GetFullPath(Path.Combine(baseDir, relativePath));
+            if (File.Exists(primary) || Directory.Exists(primary)) return primary;
+
+            string stripped = relativePath;
+            while (stripped.StartsWith(@"..\") || stripped.StartsWith("../"))
+                stripped = stripped.Substring(3);
+            string fallback = Path.GetFullPath(Path.Combine(repoRoot, stripped));
+            return File.Exists(fallback) || Directory.Exists(fallback) ? fallback : primary;
         }
 
         private void LoadConfig()
@@ -138,10 +189,10 @@ namespace MaxEntRunner
                 }
 
                 string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+                string repoRoot = FindRepoRoot();
                 foreach (var script in config.scripts)
                 {
-                    // Show full path in dropdown
-                    string fullPath = Path.GetFullPath(Path.Combine(baseDir, script.file));
+                    string fullPath = ResolvePath(baseDir, script.file, repoRoot);
                     string displayText = $"{script.name} → {fullPath}";
                     scriptDropdown.Items.Add(displayText);
                 }
@@ -211,8 +262,12 @@ namespace MaxEntRunner
 
                 // Build command
                 string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-                string pythonPath = Path.GetFullPath(Path.Combine(baseDir, config.pythonPath));
-                string scriptPath = Path.GetFullPath(Path.Combine(baseDir, script.file));
+                string repoRoot = FindRepoRoot();
+                string pythonPath = ResolvePath(baseDir, config.pythonPath, repoRoot);
+                string scriptPath = ResolvePath(baseDir, script.file, repoRoot);
+
+                AppendOutput($"Script: {script.name}\n", Color.White);
+                AppendOutput($"Path:   {scriptPath}\n", Color.White);
 
                 if (!File.Exists(pythonPath))
                 {
@@ -240,8 +295,8 @@ namespace MaxEntRunner
                     }
                 }
 
-                // Set working directory to maxent root (parent of gui_runner_published)
-                string maxentRoot = Path.GetFullPath(Path.Combine(baseDir, ".."));
+                // Set working directory to maxent root
+                string maxentRoot = repoRoot;
 
                 var startInfo = new ProcessStartInfo
                 {
@@ -296,14 +351,8 @@ namespace MaxEntRunner
                     // Try to load output image
                     if (!string.IsNullOrEmpty(script.outputImage))
                     {
-                        // Look for image in working directory first (where Python actually outputs it)
-                        string imagePath = Path.GetFullPath(Path.Combine(maxentRoot, script.outputImage));
-
-                        // Fallback: try relative to EXE location
-                        if (!File.Exists(imagePath))
-                        {
-                            imagePath = Path.GetFullPath(Path.Combine(baseDir, script.outputImage));
-                        }
+                        // Resolve image path (handles ..\ prefix in config)
+                        string imagePath = ResolvePath(baseDir, script.outputImage, repoRoot);
 
                         if (File.Exists(imagePath))
                         {
@@ -331,6 +380,21 @@ namespace MaxEntRunner
             }
         }
 
+        private void SelectAllButton_Click(object? sender, EventArgs e)
+        {
+            outputBox.SelectAll();
+            outputBox.Focus();
+        }
+
+        private void CopyButton_Click(object? sender, EventArgs e)
+        {
+            string text = outputBox.SelectionLength > 0 ? outputBox.SelectedText : outputBox.Text;
+            if (!string.IsNullOrEmpty(text))
+            {
+                Clipboard.SetDataObject(new DataObject(DataFormats.UnicodeText, text), true);
+            }
+        }
+
         private void ViewImageButton_Click(object? sender, EventArgs e)
         {
             if (config == null || scriptDropdown.SelectedIndex < 0) return;
@@ -341,16 +405,10 @@ namespace MaxEntRunner
             try
             {
                 string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-                string maxentRoot = Path.GetFullPath(Path.Combine(baseDir, ".."));
+                string repoRoot = FindRepoRoot();
 
-                // Look for image in working directory first (where scripts run)
-                string imagePath = Path.GetFullPath(Path.Combine(maxentRoot, script.outputImage));
-
-                // Fallback: try relative to EXE location
-                if (!File.Exists(imagePath))
-                {
-                    imagePath = Path.GetFullPath(Path.Combine(baseDir, script.outputImage));
-                }
+                // Resolve image path (handles ..\ prefix in config)
+                string imagePath = ResolvePath(baseDir, script.outputImage, repoRoot);
 
                 if (File.Exists(imagePath))
                 {
@@ -450,6 +508,10 @@ namespace MaxEntRunner
                 runButton.Location = new Point(10, buttonY);
             if (viewImageButton != null)
                 viewImageButton.Location = new Point(140, buttonY);
+            if (selectAllButton != null)
+                selectAllButton.Location = new Point(330, buttonY);
+            if (copyButton != null)
+                copyButton.Location = new Point(440, buttonY);
 
             // Reposition output label and box
             int outputY = buttonY + 40;
