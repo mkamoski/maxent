@@ -1,8 +1,8 @@
-# MaxEnt GUI - Quick Rebuild & Commit
-# ONE-LINER for mkamoski1 - run from anywhere!
+# MaxEnt GUI - Quick Rebuild & Publish
+# ONE-LINER for mkamoski1 - builds the download-unzip-run portable ZIP.
 
-# Build, ZIP, and stage for commit:
-cd C:\Users\mkamoski1\source\repos\maxent\gui_runner; .\Publish.ps1; cd ..\gui_runner_published; git add MaxEntRunner.zip
+# Build portable distribution (EXE + Python + all packages + scripts):
+cd C:\Users\mkamoski1\source\repos\maxent\gui_runner; .\Publish.ps1
 
-# Then just commit and push:
-# git commit -m "Update GUI"; git push
+# Output: gui_runner_published\MaxEntRunner_Portable_YYYY_MM_DD_HHmm.zip
+# Upload that ZIP to Google Drive / Dropbox for end users.
