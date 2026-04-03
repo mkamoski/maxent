@@ -25,7 +25,7 @@ namespace MaxEntRunner
 
         private void InitializeComponent()
         {
-            // Form setup
+            // Form setup.
             this.Text = "MaxEnt Python Script Runner";
             this.Size = new Size(1024, 768);
             this.MinimumSize = new Size(1024, 768);
