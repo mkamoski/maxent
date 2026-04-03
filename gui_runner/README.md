@@ -4,98 +4,24 @@
 
 ---
 
-## 📦 For End Users - TWO Distribution Options!
+## 📦 For End Users - One Download (Portable)
 
-### 🎯 Which Version Do You Need?
-
-| Feature | **LITE** (~60 MB) | **FULL** (~400 MB) |
-|---------|-------------------|-------------------|
-| **EXE Included** | ✅ Yes | ✅ Yes |
-| **Python Scripts** | ✅ Yes | ✅ Yes |
-| **Python Environment** | ❌ NO - You provide | ✅ YES - Included |
-| **Total Download** | ~60 MB | ~400 MB |
-| **Setup Required** | ⚠️ Must have venv_maxent | ✅ None - fully portable |
-| **Best For** | Developers with repo | End users, demos, USB drives |
-
----
-
-### Option 1A: LITE Version (Requires Python Setup)
-
-**⚠️ You Need BOTH:**
-1. ✅ Python 3.7.9 with venv_maxent (from maxent repo)
-2. ✅ MaxEntRunner_Lite.zip
-
-**Setup Steps:**
+**Download, unzip, run.** No Python install, no setup.
 
 ```bash
-# 1. Clone repo to get venv_maxent
-git clone https://github.com/mkamoski/maxent
-cd maxent
-
-# 2. Download MaxEntRunner_Lite.zip
-# Extract next to venv_maxent
-```
-
-**Folder Structure:**
-```
-maxent/
-├── venv_maxent/          ← From repo (800 MB, HAS ALL PACKAGES)
-└── MaxEntRunner_Lite/    ← Extract ZIP here (60 MB)
-    ├── MaxEntRunner.exe
-    ├── ScriptConfig.json  ← Points to ../venv_maxent
-    └── scripts...
-```
-
-**Run:**
-```powershell
-cd MaxEntRunner_Lite
-.\MaxEntRunner.exe
-```
-
-**If Python is elsewhere, edit ScriptConfig.json:**
-```json
-{
-  "pythonPath": "C:\\Your\\Path\\To\\venv_maxent\\Scripts\\python.exe"
-}
-```
-
-**Why Lite?**
-- ✅ Small download (60 MB)
-- ✅ You already have maxent repo
-- ✅ Faster updates (no 800 MB Python env)
-
----
-
-### Option 1B: FULL Version (Zero Setup!)
-
-**🎉 Everything Included - Just Extract and Run!**
-
-```bash
-# 1. Download MaxEntRunner_Full.zip (~400 MB)
-#    (Too large for GitHub - hosted externally)
-
-# 2. Extract anywhere you want
-Desktop/MaxEntRunner_Full/
-
+# 1. Download MaxEntRunner_Portable_YYYY_MM_DD_HHmm.zip
+# 2. Extract anywhere
 # 3. Double-click MaxEntRunner.exe
 ```
 
 **What's Inside:**
 ```
-MaxEntRunner_Full/
-├── MaxEntRunner.exe      ← Just double-click!
-├── venv_maxent/          ← Complete Python 3.7.9 + packages
-├── ScriptConfig.json     ← Pre-configured
-├── demo_simple_cartpole.py
-└── base/
-    └── collect_baseline.py
+MaxEntRunner_Portable/
+├── MaxEntRunner.exe
+├── python/               ← Python 3.7.9 + all packages
+├── ScriptConfig.json
+└── experiments + demos
 ```
-
-**Why Full?**
-- ✅ True portable - works on ANY Windows PC
-- ✅ No Python needed
-- ✅ Perfect for demos, USB drives, air-gapped systems
-- ✅ Share with non-technical users
 
 ---
 
@@ -118,6 +44,17 @@ MaxEntRunner_Full/
    # OR manually with dotnet:
    dotnet publish -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o ..\gui_runner_published
    ```
+
+---
+
+## Benchmark System
+
+Tested on:
+- **System SKU:** LENOVO_MT_82HU_BU_idea_FM_IdeaPad Flex 5 14ALC05
+- **OS:** Windows 11
+- **RAM:** 16 GB
+
+Use this as a baseline for expected performance and timeouts.
 
 3. **Run it:**
    ```powershell

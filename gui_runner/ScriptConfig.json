@@ -4,35 +4,35 @@
     {
       "name": "CartPole Demo (Quick)",
       "file": "..\\demo_simple_cartpole.py",
-      "description": "Random policy on CartPole with visualization (1 min)",
+      "description": "Overview: Randome policy on CartPole with visualization (1.25 min)",
       "parameters": [],
       "outputImage": "..\\demo_cartpole_results.png"
     },
     {
       "name": "Quick Test Suite",
       "file": "..\\test_quick.py",
-      "description": "5 quick tests to validate setup (30 sec)",
+      "description": "Overview: 5 quick tests to validate setup (37.5 sec)",
       "parameters": [],
       "outputImage": null
     },
     {
       "name": "Full Functionality Test",
       "file": "..\\test_basic_functionality.py",
-      "description": "7 comprehensive tests (2 min)",
+      "description": "Overview: 7 comprehensive tests (2.5 min)",
       "parameters": [],
       "outputImage": null
     },
     {
       "name": "Installation Diagnostic",
       "file": "..\\test_installation.py",
-      "description": "Complete installation diagnostic",
+      "description": "Overview: Complete installation diagnostic (Time estimate: N/A)",
       "parameters": [],
       "outputImage": null
     },
     {
       "name": "Baseline Training (CartPole)",
       "file": "..\\base\\collect_baseline.py",
-      "description": "Train entropy-based policy on classic control",
+      "description": "Overview: Train entropy-based policy on classic control (Time estimate: N/A)",
       "parameters": [
         {"name": "env", "label": "Environment", "default": "CartPole-v1"},
         {"name": "T", "label": "Time Steps", "default": "200"},
@@ -46,7 +46,7 @@
     {
       "name": "Ant Training (SAC)",
       "file": "..\\ant\\ant_collect_sac.py",
-      "description": "Train SAC policy on Ant-v2 (requires MuJoCo)",
+      "description": "Overview: Train SAC policy on Ant-v2 (requires MuJoCo) (Time estimate: N/A)",
       "parameters": [
         {"name": "exp_name", "label": "Experiment Name", "default": "ant_test"},
         {"name": "epochs", "label": "Epochs", "default": "10"}
@@ -56,7 +56,7 @@
     {
       "name": "Walker Training (SAC)",
       "file": "..\\walker\\walker_collect_sac.py",
-      "description": "Train SAC policy on Walker2d-v2 (requires MuJoCo)",
+      "description": "Overview: Train SAC policy on Walker2d-v2 (requires MuJoCo) (Time estimate: N/A)",
       "parameters": [
         {"name": "exp_name", "label": "Experiment Name", "default": "walker_test"},
         {"name": "epochs", "label": "Epochs", "default": "10"}
@@ -66,7 +66,7 @@
     {
       "name": "Humanoid Training (SAC)",
       "file": "..\\humanoid\\humanoid_collect_sac.py",
-      "description": "Train SAC policy on Humanoid-v2 (requires MuJoCo)",
+      "description": "Overview: Train SAC policy on Humanoid-v2 (requires MuJoCo) (Time estimate: N/A)",
       "parameters": [
         {"name": "exp_name", "label": "Experiment Name", "default": "humanoid_test"},
         {"name": "epochs", "label": "Epochs", "default": "10"}
@@ -76,7 +76,7 @@
     {
       "name": "Cheetah Training (SAC)",
       "file": "..\\cheetah\\cheetah_collect_sac.py",
-      "description": "Train SAC policy on HalfCheetah-v2 (requires MuJoCo)",
+      "description": "Overview: Train SAC policy on HalfCheetah-v2 (requires MuJoCo) (Time estimate: N/A)",
       "parameters": [
         {"name": "exp_name", "label": "Experiment Name", "default": "cheetah_test"},
         {"name": "epochs", "label": "Epochs", "default": "10"}
@@ -86,7 +86,7 @@
     {
       "name": "Swimmer Training (SAC)",
       "file": "..\\discretized_swimmer\\swimmer_collect_sac.py",
-      "description": "Train SAC policy on Swimmer-v2 (requires MuJoCo)",
+      "description": "Overview: Train SAC policy on Swimmer-v2 (requires MuJoCo) (Time estimate: N/A)",
       "parameters": [
         {"name": "exp_name", "label": "Experiment Name", "default": "swimmer_test"},
         {"name": "epochs", "label": "Epochs", "default": "10"}
