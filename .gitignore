@@ -87,6 +87,15 @@ gym_patch/
 test.sh
 
 # ==========================================
+# Large binaries
+# ==========================================
+torch_cpu.dll
+dnnl.lib
+mkldnn.lib
+mkldnn.lb
+_pywrap_tensorflow_internal.pyd
+
+# ==========================================
 # Setup & Installation Files (Generated)
 # ==========================================
 mujoco_install.txt
@@ -139,3 +148,8 @@ plots/
 *.swo
 *~
 .cache/
+/gui_runner_published/MaxEntExe202604032009.zip
+/gui_runner_published/MaxEntRunner_Portable_2026_04_03_1708.zip
+/gui_runner_published/MaxEntExe202604032009.zip
+/gui_runner_published/MaxEntRunner_Portable_2026_04_03_1708.zip
+/MaxEntExe/MaxEntRunner.exe

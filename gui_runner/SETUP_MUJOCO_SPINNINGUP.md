@@ -8,6 +8,7 @@ This guide explains what *cannot* be bundled in the portable ZIP and how to set 
 
 - **MuJoCo 2.1.0 ZIP** is bundled as `mujoco210-windows-x86_64.zip` in the portable folder.
 - **OpenAI SpinningUp** is optional and not bundled.
+- **Portable Python** is bundled in the ZIP, but Python/venv files are **not** committed to the Git repo.
 
 ---
 
@@ -68,6 +69,8 @@ Only needed for `explore/` experiments. Not required for CartPole/test scripts.
 ### Install in the bundled Python environment
 
 SpinningUp is a **one-time install** after you download and unzip the portable package.
+
+If you cloned the repo instead of using the ZIP, you must set up Python first (see below).
 
 **Example (my local repo):**
 
@@ -137,6 +140,31 @@ cd C:\Users\mkamoski1\source\repos\maxent\MaxEntExe
 python\python.exe -m pip install "setuptools<65" "wheel<0.39"
 python\python.exe -m pip install "gym==0.21.0" --no-build-isolation
 python\python.exe -m pip install git+https://github.com/openai/spinningup.git@tensorflow1
+```
+
+---
+
+## If you cloned the repo (no bundled Python)
+
+The Git repo does **not** include the Python environment (large binaries like `dnnl.lib` are excluded). You must:
+
+1) Install **Python 3.7.9**
+2) Create a venv and install requirements
+3) Point `gui_runner/ScriptConfig.json` to your venv python path
+
+Example (PowerShell):
+
+```powershell
+cd C:\Users\mkamoski1\source\repos\maxent
+py -3.7 -m venv venv_maxent
+venv_maxent\Scripts\python.exe -m pip install --upgrade pip
+venv_maxent\Scripts\python.exe -m pip install -r requirements.txt
+```
+
+Then set `pythonPath` in `gui_runner/ScriptConfig.json` to:
+
+```
+..\venv_maxent\Scripts\python.exe
 ```
 
 ---
