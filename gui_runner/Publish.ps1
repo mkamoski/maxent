@@ -17,11 +17,12 @@ Write-Host ""
 
 # Paths
 $repoRoot = Resolve-Path ".."
-$publishDir = Join-Path $repoRoot "gui_runner_published"
+$publishDir = "C:\test\maxent"
 $exePath = Join-Path $publishDir "MaxEntRunner.exe"
-$portableDir = Join-Path $repoRoot "MaxEntRunner_Portable"
-$timestamp = Get-Date -Format "yyyy_MM_dd_HHmm"
-$zipPath = Join-Path $publishDir "MaxEntRunner_Portable_$timestamp.zip"
+$portableRoot = "C:\temp"
+$portableDir = Join-Path $portableRoot "MaxEntExe"
+$timestamp = Get-Date -Format "yyyyMMddHHmm"
+$zipPath = Join-Path $publishDir "MaxEntExe$timestamp.zip"
 $venvSource = Join-Path $repoRoot "venv_maxent"
 $systemPython = "C:\Users\mkamoski\AppData\Local\Programs\Python\Python37"
 $embeddableUrl = "https://www.python.org/ftp/python/3.7.9/python-3.7.9-embed-amd64.zip"
@@ -31,6 +32,7 @@ $pythonDir = Join-Path $portableDir "python"
 # Step 1: Build EXE
 if (-not $SkipBuild) {
     Write-Host "[1/7] Building MaxEntRunner.exe..." -ForegroundColor Yellow
+    if (-not (Test-Path $publishDir)) { New-Item -ItemType Directory -Path $publishDir -Force | Out-Null }
     dotnet publish -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o $publishDir
     if ($LASTEXITCODE -ne 0) { Write-Host "BUILD FAILED!" -ForegroundColor Red; exit 1 }
     Unblock-File -Path $exePath -ErrorAction SilentlyContinue
@@ -41,6 +43,7 @@ if (-not $SkipBuild) {
 
 # Step 2: Clean old portable bundle
 Write-Host "[2/7] Preparing portable directory..." -ForegroundColor Yellow
+if (-not (Test-Path $portableRoot)) { New-Item -ItemType Directory -Path $portableRoot -Force | Out-Null }
 if (Test-Path $portableDir) { Remove-Item $portableDir -Recurse -Force }
 if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
 New-Item -ItemType Directory -Path $portableDir -Force | Out-Null
@@ -173,7 +176,7 @@ Everything is included:
 - Nothing else!
 
 ## Folder Structure:
-MaxEntRunner_Portable/
+MaxEntExe/
   MaxEntRunner.exe        <- Double-click this!
   ScriptConfig.json       <- Script configuration
   python/                 <- Complete Python 3.7.9 runtime
@@ -241,7 +244,7 @@ Write-Host "  python/               (Python 3.7.9 + ALL packages)" -ForegroundCo
 Write-Host "  11 experiment scripts (Ant, Cheetah, Walker, etc.)" -ForegroundColor White
 Write-Host ""
 Write-Host "To distribute:" -ForegroundColor Yellow
-Write-Host "  Upload MaxEntRunner_Portable.zip to Google Drive / Dropbox" -ForegroundColor White
+Write-Host "  Upload $zipPath to Google Drive / Dropbox" -ForegroundColor White
 Write-Host "  Recipient: Download -> Unzip -> Double-click MaxEntRunner.exe" -ForegroundColor White
 Write-Host ""
 Write-Host "To test locally:" -ForegroundColor Yellow

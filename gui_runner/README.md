@@ -9,14 +9,14 @@
 **Download, unzip, run.** No Python install, no setup.
 
 ```bash
-# 1. Download MaxEntRunner_Portable_YYYY_MM_DD_HHmm.zip
+# 1. Download MaxEntRunnerPortableYYYYMMDDHHmm.zip
 # 2. Extract anywhere
 # 3. Double-click MaxEntRunner.exe
 ```
 
 **What's Inside:**
 ```
-MaxEntRunner_Portable/
+MaxEntRunnerPortable/
 ├── MaxEntRunner.exe
 ├── python/               ← Python 3.7.9 + all packages
 ├── ScriptConfig.json
