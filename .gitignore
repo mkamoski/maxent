@@ -17,6 +17,7 @@
 # Operating System & IDE
 # ==========================================
 .vs/
+**/.vs/
 .vscode/
 *.user
 *.DS_Store
