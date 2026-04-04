@@ -666,7 +666,9 @@ namespace MaxEntRunner
         {
             string timestamp = DateTime.Now.ToString("yyyy-MM-dd-HHmm-ss-fff");
             string fileName = $"maxent-output={timestamp}.txt";
-            string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
+            string outputDir = @"C:\test";
+            Directory.CreateDirectory(outputDir);
+            string filePath = Path.Combine(outputDir, fileName);
             File.WriteAllText(filePath, outputBox.Text, Encoding.UTF8);
             return filePath;
         }
