@@ -26,6 +26,8 @@ namespace MaxEntRunner
         private ComboBox timeoutDropdown = null!;
         private Label documentationLabel = null!;
         private ComboBox documentationDropdown = null!;
+        private Label mujocoLabel = null!;
+        private TextBox mujocoPathBox = null!;
         private Label buildInfoLabel = null!;
         private Label outputLabel = null!;
         private Label imageLabel = null!;
@@ -81,6 +83,12 @@ namespace MaxEntRunner
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
             documentationDropdown.SelectedIndexChanged += DocumentationDropdown_SelectedIndexChanged;
+            mujocoLabel = new Label { Text = "MuJoCo path:", AutoSize = true };
+            mujocoPathBox = new TextBox
+            {
+                ReadOnly = true,
+                BackColor = SystemColors.Control
+            };
             paramLabel = new Label { Text = "Parameters:", AutoSize = true };
             int paramHeight = (int)(this.ClientSize.Height * 0.2);
             paramPanel = new Panel
@@ -215,6 +223,8 @@ namespace MaxEntRunner
             this.Controls.Add(paramLabel);
             this.Controls.Add(documentationLabel);
             this.Controls.Add(documentationDropdown);
+            this.Controls.Add(mujocoLabel);
+            this.Controls.Add(mujocoPathBox);
             this.Controls.Add(paramPanel);
             this.Controls.Add(buttonPanel);
             this.Controls.Add(outputLabel);
@@ -223,7 +233,29 @@ namespace MaxEntRunner
             this.Controls.Add(imageBox);
 
             UpdateBuildInfoLabel();
+            InitializeMujocoPath();
             LayoutControls();
+        }
+
+        private void InitializeMujocoPath()
+        {
+            string? mujocoHome = Environment.GetEnvironmentVariable("MUJOCO_HOME");
+            string defaultPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "mujoco", "mujoco210");
+            string candidate = !string.IsNullOrWhiteSpace(mujocoHome) ? mujocoHome : defaultPath;
+
+            if (Directory.Exists(candidate))
+            {
+                mujocoPathBox.Text = candidate;
+                mujocoPathBox.ReadOnly = true;
+                mujocoPathBox.BackColor = SystemColors.Control;
+            }
+            else
+            {
+                mujocoPathBox.Text = candidate;
+                mujocoPathBox.ReadOnly = false;
+                mujocoPathBox.BackColor = Color.White;
+                AppendOutput($"\nMuJoCo not found at: {candidate}\n", Color.Yellow);
+            }
         }
 
         private void UpdateBuildInfoLabel()
@@ -268,6 +300,13 @@ namespace MaxEntRunner
             documentationDropdown.Location = new Point(x, y);
             documentationDropdown.Size = new Size(width90, documentationDropdown.Height);
             y += documentationDropdown.Height + lineGap;
+
+            mujocoLabel.Location = new Point(x, y);
+            y += mujocoLabel.Height + 4;
+
+            mujocoPathBox.Location = new Point(x, y);
+            mujocoPathBox.Size = new Size(width90, mujocoPathBox.Height);
+            y += mujocoPathBox.Height + lineGap;
 
             paramLabel.Location = new Point(x, y);
             y += paramLabel.Height + 4;
@@ -537,7 +576,7 @@ namespace MaxEntRunner
                 startInfo.EnvironmentVariables["PYTHONIOENCODING"] = "utf-8";
                 // Silence CUDA/GPU warnings on machines without GPU drivers
                 startInfo.EnvironmentVariables["CUDA_VISIBLE_DEVICES"] = "-1";
-                startInfo.EnvironmentVariables["TF_CPP_MIN_LOG_LEVEL"] = "2";
+                startInfo.EnvironmentVariables["TF_CPP_MIN_LOG_LEVEL"] = "3";
 
                 AppendOutput($"Command: {pythonPath} {args}\n", Color.Cyan);
                 AppendOutput($"Working Dir: {startInfo.WorkingDirectory}\n\n", Color.Cyan);

@@ -9,19 +9,24 @@
 **Download, unzip, run.** No Python install, no setup.
 
 ```bash
-# 1. Download MaxEntRunner_Portable_YYYY_MM_DD_HHmm.zip
+# 1. Download MaxEntExeYYYYMMDDHHmm.zip
 # 2. Extract anywhere
 # 3. Double-click MaxEntRunner.exe
 ```
 
 **What's Inside:**
 ```
-MaxEntRunner_Portable/
+MaxEntExe/
 ├── MaxEntRunner.exe
 ├── python/               ← Python 3.7.9 + all packages
 ├── ScriptConfig.json
 └── experiments + demos
 ```
+
+**MuJoCo & SpinningUp (2019-era baseline):**
+- MuJoCo is required only for Ant/Walker/Humanoid/Cheetah/Swimmer.
+- SpinningUp is required only for `explore/` scripts.
+- See `SETUP_MUJOCO_SPINNINGUP.md` for step-by-step setup.
 
 ---
 

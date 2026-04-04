@@ -19,14 +19,16 @@ Write-Host ""
 $repoRoot = Resolve-Path ".."
 $publishDir = Join-Path $repoRoot "gui_runner_published"
 $exePath = Join-Path $publishDir "MaxEntRunner.exe"
-$portableDir = Join-Path $repoRoot "MaxEntRunner_Portable"
-$timestamp = Get-Date -Format "yyyy_MM_dd_HHmm"
-$zipPath = Join-Path $publishDir "MaxEntRunner_Portable_$timestamp.zip"
+$portableDir = Join-Path $repoRoot "MaxEntExe"
+$timestamp = Get-Date -Format "yyyyMMddHHmm"
+$zipPath = Join-Path $publishDir "MaxEntExe$timestamp.zip"
 $venvSource = Join-Path $repoRoot "venv_maxent"
 $systemPython = "C:\Users\mkamoski\AppData\Local\Programs\Python\Python37"
 $embeddableUrl = "https://www.python.org/ftp/python/3.7.9/python-3.7.9-embed-amd64.zip"
 $embeddableZip = Join-Path $env:TEMP "python-3.7.9-embed-amd64.zip"
 $pythonDir = Join-Path $portableDir "python"
+$mujocoZipUrl = "https://github.com/deepmind/mujoco/releases/download/2.1.0/mujoco210-windows-x86_64.zip"
+$mujocoZipPath = Join-Path $portableDir "mujoco210-windows-x86_64.zip"
 
 # Step 1: Build EXE
 if (-not $SkipBuild) {
@@ -51,8 +53,17 @@ Write-Host "[3/7] Copying MaxEntRunner.exe..." -ForegroundColor Yellow
 Copy-Item $exePath $portableDir -Force
 Write-Host "  EXE copied" -ForegroundColor Green
 
-# Step 4: Build portable Python (brute-force copy from system install + site-packages)
-Write-Host "[4/7] Building portable Python 3.7.9..." -ForegroundColor Yellow
+# Step 4: Bundle MuJoCo 2.1.0 ZIP
+Write-Host "[4/8] Downloading MuJoCo 2.1.0 ZIP..." -ForegroundColor Yellow
+try {
+    Invoke-WebRequest -Uri $mujocoZipUrl -OutFile $mujocoZipPath -UseBasicParsing
+    Write-Host "  MuJoCo ZIP saved: $mujocoZipPath" -ForegroundColor Green
+} catch {
+    Write-Host "  WARNING: MuJoCo download failed: $_" -ForegroundColor Red
+}
+
+# Step 5: Build portable Python (brute-force copy from system install + site-packages)
+Write-Host "[5/8] Building portable Python 3.7.9..." -ForegroundColor Yellow
 Write-Host "  Strategy: Copy system Python + venv site-packages (brute force)" -ForegroundColor Gray
 
 New-Item -ItemType Directory -Path $pythonDir -Force | Out-Null
@@ -102,8 +113,8 @@ if (Test-Path $scriptsSrc) {
 $pySize = [math]::Round((Get-ChildItem $pythonDir -Recurse -ErrorAction SilentlyContinue | Measure-Object -Property Length -Sum).Sum / 1GB, 2)
 Write-Host "  Portable Python size: $pySize GB" -ForegroundColor Green
 
-# Step 5: Copy experiment scripts
-Write-Host "[5/7] Copying experiment scripts..." -ForegroundColor Yellow
+# Step 6: Copy experiment scripts
+Write-Host "[6/8] Copying experiment scripts..." -ForegroundColor Yellow
 
 # Root-level scripts
 $scriptFiles = @(
@@ -128,8 +139,26 @@ foreach ($dir in $scriptDirs) {
 }
 Write-Host "  All experiment scripts copied" -ForegroundColor Green
 
-# Step 6: Create ScriptConfig.json (pointing to bundled python)
-Write-Host "[6/7] Creating ScriptConfig.json..." -ForegroundColor Yellow
+# Step 7: Copy source files (text-based, git-tracked)
+Write-Host "[7/8] Copying source files (text only)..." -ForegroundColor Yellow
+$sourceDir = Join-Path $portableDir "source"
+New-Item -ItemType Directory -Path $sourceDir -Force | Out-Null
+$sourceExtensions = @(".py", ".json", ".md", ".txt", ".cs", ".csproj", ".sln", ".ps1", ".yml", ".yaml", ".bat")
+$trackedFiles = git -C $repoRoot ls-files
+foreach ($file in $trackedFiles) {
+    $ext = [IO.Path]::GetExtension($file)
+    if ($sourceExtensions -notcontains $ext) { continue }
+    $src = Join-Path $repoRoot $file
+    if (-not (Test-Path $src)) { continue }
+    $dst = Join-Path $sourceDir $file
+    $dstDir = Split-Path $dst -Parent
+    if (-not (Test-Path $dstDir)) { New-Item -ItemType Directory -Path $dstDir -Force | Out-Null }
+    Copy-Item $src $dst -Force
+}
+Write-Host "  Source files copied to $sourceDir" -ForegroundColor Green
+
+# Step 8: Create ScriptConfig.json (pointing to bundled python)
+Write-Host "[8/8] Creating ScriptConfig.json..." -ForegroundColor Yellow
 $sourceConfig = Join-Path $repoRoot "gui_runner\ScriptConfig.json"
 if (Test-Path $sourceConfig) {
     $configContent = Get-Content $sourceConfig -Raw | ConvertFrom-Json
@@ -197,9 +226,9 @@ MaxEntRunner_Portable/
 "@
 Set-Content -Path (Join-Path $portableDir "README.txt") -Value $readme
 
-# Step 7: Create ZIP
+# Step 9: Create ZIP
 if (-not $SkipZip) {
-    Write-Host "[7/7] Creating ZIP archive..." -ForegroundColor Yellow
+    Write-Host "[9/9] Creating ZIP archive..." -ForegroundColor Yellow
     Write-Host "  This will take several minutes for a ~2 GB bundle..." -ForegroundColor Gray
 
     try {
@@ -211,8 +240,8 @@ if (-not $SkipZip) {
     }
     catch {
         Write-Host "  ERROR creating ZIP: $_" -ForegroundColor Red
-        Write-Host "  Try: Use 7-Zip manually for better compression:" -ForegroundColor Yellow
-        Write-Host "    7z a -mx9 MaxEntRunner_Portable.7z $portableDir" -ForegroundColor White
+Write-Host "  Try: Use 7-Zip manually for better compression:" -ForegroundColor Yellow
+Write-Host "    7z a -mx9 MaxEntExe.7z $portableDir" -ForegroundColor White
     }
 } else {
     Write-Host "[7/7] Skipping ZIP (use -SkipZip to test without compression)..." -ForegroundColor Gray
@@ -238,10 +267,11 @@ Write-Host ""
 Write-Host "Contents:" -ForegroundColor Yellow
 Write-Host "  MaxEntRunner.exe      (GUI)" -ForegroundColor White
 Write-Host "  python/               (Python 3.7.9 + ALL packages)" -ForegroundColor White
+Write-Host "  mujoco210-windows-x86_64.zip (MuJoCo 2.1.0)" -ForegroundColor White
 Write-Host "  11 experiment scripts (Ant, Cheetah, Walker, etc.)" -ForegroundColor White
 Write-Host ""
 Write-Host "To distribute:" -ForegroundColor Yellow
-Write-Host "  Upload MaxEntRunner_Portable.zip to Google Drive / Dropbox" -ForegroundColor White
+Write-Host "  Upload $zipPath to Google Drive / Dropbox" -ForegroundColor White
 Write-Host "  Recipient: Download -> Unzip -> Double-click MaxEntRunner.exe" -ForegroundColor White
 Write-Host ""
 Write-Host "To test locally:" -ForegroundColor Yellow
