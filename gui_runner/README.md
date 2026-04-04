@@ -76,6 +76,8 @@ Use this as a baseline for expected performance and timeouts.
 
 ## 🔧 For Developers (Build & Publish)
 
+Note: `gui_runner_published/`, `MaxEntExe/`, and ZIP archives are ignored by Git.
+
 ### Prerequisites:
 - .NET 8.0 SDK installed
 - Visual Studio 2026 (optional)

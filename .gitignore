@@ -6,12 +6,7 @@
 !ScriptConfig.json
 !**/ScriptConfig.json
 !gui_runner/ScriptConfig.json
-!gui_runner_published/ScriptConfig.json
-!MaxEntRunner_Lite/ScriptConfig.json
-!MaxEntRunner_Full/ScriptConfig.json
-# Force include distribution ZIPs
-!gui_runner_published/MaxEntRunner_Lite.zip
-!gui_runner_published/MaxEntRunner_Full.zip
+# Published outputs and portable bundles are never committed
 
 # ========================================== 
 # Operating System & IDE
@@ -64,18 +59,21 @@ htmlcov/
 # ==========================================
 # Project Specific - MaxEnt GUI Runner
 # ==========================================
-# Don't commit the large EXE (users extract from ZIP or build it)
-gui_runner_published/MaxEntRunner.exe
-gui_runner_published/*.pdb
+# Don't commit published outputs
+gui_runner_published/
 
 # Ignore .NET build artifacts (anywhere in repo)
 obj/
 bin/
 
-# Ignore portable distribution bundle folders (keep only the ZIPs)
+# Ignore portable distribution bundle folders and archives
 MaxEntRunner_Full/
 MaxEntRunner_Lite/
 MaxEntRunner_Portable/
+MaxEntExe/
+MaxEntExe*.zip
+*.zip
+*.7z
 
 # ==========================================
 # Project Specific - MaxEnt Outputs
@@ -141,5 +139,3 @@ plots/
 *.swo
 *~
 .cache/
-/gui_runner_published/MaxEntRunner_Full.zip
-/gui_runner_published/MaxEntRunner_Lite.zip
