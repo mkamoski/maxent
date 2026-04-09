@@ -19,6 +19,8 @@ def init_state(env):
         return [np.pi, 0] 
     elif env == "MountainCarContinuous-v0":
         return [-0.50, 0]
+    elif env == "CartPole-v1":
+        return [0, 0, 0, 0]
 
 
 class CartEntropyPolicy(nn.Module):
@@ -70,6 +72,8 @@ class CartEntropyPolicy(nn.Module):
         action = m.sample()
         self.saved_log_probs.append(m.log_prob(action))
 
+        if base_utils.args.env == "CartPole-v1":
+            return int(action.item())
         if (action.item() == 1):
             return [0]
         elif (action.item() == 0):
@@ -108,12 +112,17 @@ class CartEntropyPolicy(nn.Module):
         elif base_utils.args.env == "MountainCarContinuous-v0":
             self.env.env.state = [-0.50, 0]
             return np.array(self.env.env.state)
+        elif base_utils.args.env == "CartPole-v1":
+            self.env.env.state = [0, 0, 0, 0]
+            return np.array(self.env.env.state)
 
     def get_obs(self):
         if base_utils.args.env == "Pendulum-v0":
             theta, thetadot = self.env.env.state
             return np.array([np.cos(theta), np.sin(theta), thetadot])
         elif base_utils.args.env == "MountainCarContinuous-v0":
+            return np.array(self.env.env.state)
+        elif base_utils.args.env == "CartPole-v1":
             return np.array(self.env.env.state)
 
     def learn_policy(self, reward_fn, 
@@ -158,8 +167,11 @@ class CartEntropyPolicy(nn.Module):
         print("Simulation starting at = " + str(state))
         p = np.zeros(shape=(tuple(base_utils.num_states)))
         for t in range(T):  
-            action = self.select_action(state)[0]
-            state, reward, done, _ = env.step([action])
+            action = self.select_action(state)
+            if base_utils.args.env == "CartPole-v1":
+                state, reward, done, _ = env.step(action)
+            else:
+                state, reward, done, _ = env.step([action[0]])
             p[tuple(base_utils.discretize_state(state))] += 1
             
             if render:
@@ -202,13 +214,19 @@ class CartEntropyPolicy(nn.Module):
         p = np.zeros(shape=(tuple(base_utils.num_states)))
         for t in range(T):  
             r = random.random()
-            action = -1
-            if (r < 1/3.):
-                action = 0
-            elif r < 2/3.:
-                action = 1
+            if base_utils.args.env == "CartPole-v1":
+                action = 0 if r < 0.5 else 1
+            else:
+                action = -1
+                if (r < 1/3.):
+                    action = 0
+                elif r < 2/3.:
+                    action = 1
 
-            state, reward, done, _ = env.step([action])
+            if base_utils.args.env == "CartPole-v1":
+                state, reward, done, _ = env.step(int(action))
+            else:
+                state, reward, done, _ = env.step([action])
             p[tuple(base_utils.discretize_state(state))] += 1
             
             if render:

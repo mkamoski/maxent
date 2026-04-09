@@ -24,6 +24,8 @@ args = base_utils.get_args()
 def select_action(probs):
     m = Categorical(probs)
     action = m.sample()
+    if base_utils.args.env == "CartPole-v1":
+        return int(action.item())
     if (action.item() == 1):
         return [0]
     elif (action.item() == 0):
@@ -52,8 +54,11 @@ def execute_policy_internal(env, T, policies, state, render):
             probs += prob
         probs /= len(policies)
         action = select_action(probs)
-        
-        state, reward, done, _ = env.step(action)
+
+        if base_utils.args.env == "CartPole-v1":
+            state, reward, done, _ = env.step(action)
+        else:
+            state, reward, done, _ = env.step(action)
         p[tuple(base_utils.discretize_state(state))] += 1
         if (t == random_T and not render):
             random_initial_state = env.env.state

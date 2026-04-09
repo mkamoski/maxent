@@ -66,6 +66,14 @@ cheetah_obs_dim = 5 #len(env.observation_space.high)
 cheetah_action_dim = 6
 cheetah_space_dim = cheetah_num_bins**cheetah_obs_dim
 
+# Env variables for CartPole
+cart_pos_bins = 10
+cart_vel_bins = 10
+cart_ang_bins = 10
+cart_ang_vel_bins = 10
+cartpole_obs_dim = 4
+cartpole_action_dim = 2
+
 
 def discretize_range(lower_bound, upper_bound, num_bins):
     return np.linspace(lower_bound, upper_bound, num_bins + 1)[1:-1]
@@ -80,6 +88,17 @@ def get_state_bins():
     if args.env == "HalfCheetah-v2":
         for i in range(cheetah_obs_dim):
             state_bins.append(discretize_range(-2, 2, cheetah_num_bins))
+    elif args.env == "CartPole-v1":
+        state_bins = [
+            # Cart position
+            discretize_range(-2.4, 2.4, cart_pos_bins),
+            # Cart velocity
+            discretize_range(-3.0, 3.0, cart_vel_bins),
+            # Pole angle
+            discretize_range(-0.2095, 0.2095, cart_ang_bins),
+            # Pole angular velocity
+            discretize_range(-3.5, 3.5, cart_ang_vel_bins)
+        ]
     elif args.env == "MountainCarContinuous-v0":
         state_bins = [
             # Cart position.
@@ -100,6 +119,8 @@ def get_state_bins():
 def get_obs_dim():
     if args.env == "HalfCheetah-v2":
         return cheetah_obs_dim
+    elif args.env == "CartPole-v1":
+        return cartpole_obs_dim
     elif args.env == "MountainCarContinuous-v0":
         return mc_obs_dim
     elif args.env == "Pendulum-v0":
@@ -108,6 +129,8 @@ def get_obs_dim():
 def get_action_dim():
     if args.env == "HalfCheetah-v2":
         return cheetah_action_dim
+    elif args.env == "CartPole-v1":
+        return cartpole_action_dim
     elif args.env == "MountainCarContinuous-v0":
         return mc_action_dim
     elif args.env == "Pendulum-v0":
@@ -116,6 +139,8 @@ def get_action_dim():
 def get_space_dim():
     if args.env == "HalfCheetah-v2":
         return cheetah_space_dim
+    elif args.env == "CartPole-v1":
+        return (cart_pos_bins, cart_vel_bins, cart_ang_bins, cart_ang_vel_bins)
     elif args.env == "MountainCarContinuous-v0":
         return (nx, nv)
     elif args.env == "Pendulum-v0":
@@ -127,6 +152,8 @@ def get_num_states(obs_dim, state_bins):
         num_states.append(len(state_bins[i]) + 1)
 
     if args.env == "HalfCheetah-v2":
+        return num_states
+    elif args.env == "CartPole-v1":
         return num_states
     elif args.env == "MountainCarContinuous-v0":
         return num_states
@@ -143,7 +170,7 @@ if args.env != 'Ant-v2' and args.env != 'Humanoid-v2':
 
     print(state_bins)
 
-total_state_space = nv*nx
+    total_state_space = int(np.prod(num_states)) if num_states is not None else 0
 
 # to discretize observation from pendulum, first figure out what theta is
 # from the observation

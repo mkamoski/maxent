@@ -27,6 +27,8 @@ namespace MaxEntRunner
         private Label documentationLabel = null!;
         private ComboBox documentationDropdown = null!;
         private Label buildInfoLabel = null!;
+        private Label scriptStartedLabel = null!;
+        private Label scriptEndedLabel = null!;
         private Label outputLabel = null!;
         private Label imageLabel = null!;
         private RichTextBox outputBox = null!;
@@ -53,7 +55,9 @@ namespace MaxEntRunner
 
             // Script dropdown
             scriptLabel = new Label { Text = "Select Script:", AutoSize = true };
-            buildInfoLabel = new Label { Text = "Last built: unknown", Location = new Point(10, 10), AutoSize = true };
+            buildInfoLabel = new Label { Text = "ExeDate: unknown", Location = new Point(10, 10), AutoSize = true };
+            scriptStartedLabel = new Label { Text = "ScriptStared: n/a", AutoSize = false };
+            scriptEndedLabel = new Label { Text = "ScriptEnded: n/a", AutoSize = false };
             scriptDropdown = new ComboBox
             {
                 Location = new Point(10, 30),
@@ -158,7 +162,7 @@ namespace MaxEntRunner
 
             timeoutLabel = new Label
             {
-                Text = "Stop if running > (minutes)",
+                Text = "Stop if running > minutes: ",
                 AutoSize = true,
                 Margin = new Padding(10, 6, 0, 0)
             };
@@ -168,8 +172,8 @@ namespace MaxEntRunner
                 Size = new Size(80, 25),
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
-            timeoutDropdown.Items.AddRange(new object[] { "15", "30", "45", "60", "75", "90", "105", "120" });
-            timeoutDropdown.SelectedIndex = 1;
+            timeoutDropdown.Items.AddRange(new object[] { "15", "30", "45", "60", "75", "90", "105", "120", "240" });
+            timeoutDropdown.SelectedItem = "240";
 
             runTimer = new System.Windows.Forms.Timer
             {
@@ -209,6 +213,8 @@ namespace MaxEntRunner
 
             // Add controls
             this.Controls.Add(buildInfoLabel);
+            this.Controls.Add(scriptStartedLabel);
+            this.Controls.Add(scriptEndedLabel);
             this.Controls.Add(scriptLabel);
             this.Controls.Add(scriptDropdown);
             this.Controls.Add(descriptionBox);
@@ -230,13 +236,23 @@ namespace MaxEntRunner
         {
             try
             {
-                string exePath = Assembly.GetExecutingAssembly().Location;
-                DateTime lastBuilt = File.GetLastWriteTime(exePath);
-                buildInfoLabel.Text = $"Last built: {lastBuilt:yyyy-MM-dd HH:mm:ss}";
+                string? exePath = Environment.ProcessPath;
+                if (string.IsNullOrWhiteSpace(exePath))
+                {
+                    string? entryName = Assembly.GetEntryAssembly()?.GetName().Name;
+                    exePath = string.IsNullOrWhiteSpace(entryName)
+                        ? null
+                        : Path.Combine(AppContext.BaseDirectory, $"{entryName}.dll");
+                }
+
+                DateTime lastBuilt = exePath is null ? DateTime.MinValue : File.GetLastWriteTime(exePath);
+                buildInfoLabel.Text = lastBuilt == DateTime.MinValue
+                    ? "ExeDate: unknown"
+                    : $"ExeDate: {lastBuilt:yyyy-MM-dd-HHmm-ss.fffff}";
             }
             catch
             {
-                buildInfoLabel.Text = "Last built: unknown";
+                buildInfoLabel.Text = "ExeDate: unknown";
             }
         }
 
@@ -248,8 +264,14 @@ namespace MaxEntRunner
             int x = 10;
             int y = 10 + lineGap;
 
+            int headerHeight = TextRenderer.MeasureText("A", this.Font).Height;
+            scriptStartedLabel.Size = new Size(350, headerHeight);
+            scriptEndedLabel.Size = new Size(350, headerHeight);
+
             buildInfoLabel.Location = new Point(x, y);
-            y += buildInfoLabel.Height + lineGap;
+            scriptStartedLabel.Location = new Point(buildInfoLabel.Right + 20, y);
+            scriptEndedLabel.Location = new Point(scriptStartedLabel.Right + 20, y);
+            y += Math.Max(buildInfoLabel.Height, Math.Max(scriptStartedLabel.Height, scriptEndedLabel.Height)) + lineGap;
 
             scriptLabel.Location = new Point(x, y);
             y += scriptLabel.Height + 4;
@@ -373,7 +395,7 @@ namespace MaxEntRunner
                 Path = path;
             }
 
-            public override string ToString() => $"{Name} -- {Path}";
+            public override string ToString() => Path;
         }
 
         private void LoadDocumentationList()
@@ -385,8 +407,7 @@ namespace MaxEntRunner
                             && !path.Contains("\\python\\", StringComparison.OrdinalIgnoreCase)
                             && !path.Contains("\\.git\\", StringComparison.OrdinalIgnoreCase)
                             && !path.Contains("\\MaxEntRunner_", StringComparison.OrdinalIgnoreCase))
-                .OrderBy(path => Path.GetFileName(path), StringComparer.OrdinalIgnoreCase)
-                .ThenBy(path => path, StringComparer.OrdinalIgnoreCase);
+                .OrderBy(path => path, StringComparer.OrdinalIgnoreCase);
 
             foreach (var file in files)
             {
@@ -437,12 +458,13 @@ namespace MaxEntRunner
                 {
                     Text = param.label + ":",
                     Location = new Point(10, y),
-                    AutoSize = true
+                    AutoSize = false,
+                    Size = new Size(250, TextRenderer.MeasureText("A", this.Font).Height)
                 };
 
                 TextBox textBox = new TextBox
                 {
-                    Location = new Point(150, y - 3),
+                    Location = new Point(350, y - 3),
                     Size = new Size(300, 25),
                     Text = param.@default
                 };
@@ -456,7 +478,40 @@ namespace MaxEntRunner
             }
 
             // Enable view button if script has output image
-            viewImageButton.Enabled = !string.IsNullOrEmpty(script.outputImage);
+            viewImageButton.Enabled = !string.IsNullOrEmpty(script.outputImage) && !stopButton.Enabled;
+        }
+
+        private void SetUiRunning(bool isRunning)
+        {
+            runButton.Enabled = !isRunning;
+            stopButton.Enabled = isRunning;
+            scriptDropdown.Enabled = !isRunning;
+            documentationDropdown.Enabled = !isRunning;
+            timeoutDropdown.Enabled = !isRunning;
+            selectAllButton.Enabled = !isRunning;
+            copyButton.Enabled = !isRunning;
+            saveOutputButton.Enabled = !isRunning;
+            openOutputButton.Enabled = !isRunning;
+
+            bool hasOutputImage = false;
+            if (config != null && scriptDropdown.SelectedIndex >= 0)
+            {
+                var script = config.scripts[scriptDropdown.SelectedIndex];
+                hasOutputImage = !string.IsNullOrEmpty(script.outputImage);
+            }
+
+            viewImageButton.Enabled = !isRunning && hasOutputImage;
+        }
+
+        private void SetScriptStarted(DateTime timestamp)
+        {
+            scriptStartedLabel.Text = $"ScriptStared: {timestamp:yyyy-MM-dd-HHmm-ss.fffff}";
+            scriptEndedLabel.Text = "ScriptEnded: n/a";
+        }
+
+        private void SetScriptEnded(DateTime timestamp)
+        {
+            scriptEndedLabel.Text = $"ScriptEnded: {timestamp:yyyy-MM-dd-HHmm-ss.fffff}";
         }
 
         private async void RunButton_Click(object? sender, EventArgs e)
@@ -467,12 +522,12 @@ namespace MaxEntRunner
 
             try
             {
-                runButton.Enabled = false;
-                stopButton.Enabled = true;
+                SetUiRunning(true);
                 outputBox.Clear();
                 imageBox.Image = null;
 
                 runStartTime = DateTime.Now;
+                SetScriptStarted(runStartTime.Value);
                 AppendOutput($"Start Time: {runStartTime:HH:mm:ss}\n", Color.Cyan);
                 runTimer.Start();
 
@@ -607,8 +662,8 @@ namespace MaxEntRunner
             }
             finally
             {
-                runButton.Enabled = true;
-                stopButton.Enabled = false;
+                SetUiRunning(false);
+                SetScriptEnded(DateTime.Now);
                 currentProcess = null;
                 runTimer.Stop();
             }
@@ -617,6 +672,8 @@ namespace MaxEntRunner
         private void StopButton_Click(object? sender, EventArgs e)
         {
             ForceStopCurrentProcess("User requested stop");
+            SetUiRunning(false);
+            SetScriptEnded(DateTime.Now);
         }
 
         private void SelectAllButton_Click(object? sender, EventArgs e)
@@ -691,7 +748,7 @@ namespace MaxEntRunner
         {
             if (timeoutDropdown.SelectedItem == null) return 0;
             if (!int.TryParse(timeoutDropdown.SelectedItem.ToString(), out int minutes)) return 0;
-            return Math.Clamp(minutes, 15, 120);
+            return Math.Clamp(minutes, 15, 240);
         }
 
         private void ForceStopCurrentProcess(string reason)

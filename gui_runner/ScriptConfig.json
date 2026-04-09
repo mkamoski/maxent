@@ -32,7 +32,7 @@
     {
       "name": "Baseline Training (CartPole)",
       "file": "..\\base\\collect_baseline.py",
-      "description": "Overview: Train entropy-based policy on classic control (Time estimate: N/A)",
+      "description": "Overview: Train entropy-based policy on classic control (Time estimate: 60 minutes for default settings)",
       "parameters": [
         {"name": "env", "label": "Environment", "default": "CartPole-v1"},
         {"name": "T", "label": "Time Steps", "default": "200"},
@@ -48,6 +48,7 @@
       "file": "..\\ant\\ant_collect_sac.py",
       "description": "Overview: Train SAC policy on Ant-v2 (requires MuJoCo) (Time estimate: N/A)",
       "parameters": [
+        {"name": "env", "label": "Environment", "default": "Ant-v2"},
         {"name": "exp_name", "label": "Experiment Name", "default": "ant_test"},
         {"name": "epochs", "label": "Epochs", "default": "10"}
       ],
