@@ -18,7 +18,6 @@ namespace MaxEntRunner
         private Button runButton = null!;
         private Button stopButton = null!;
         private Button viewImageButton = null!;
-        private Button baselineQuickRunButton = null!;
         private Button baselineDefaultsButton = null!;
         private Button baselineMinimumsButton = null!;
         private Button selectAllButton = null!;
@@ -100,7 +99,7 @@ namespace MaxEntRunner
             int buttonY = 175 + paramHeight + 10;
             buttonPanel = new FlowLayoutPanel
             {
-                AutoSize = false,
+                AutoSize = true,
                 WrapContents = true,
                 FlowDirection = FlowDirection.LeftToRight
             };
@@ -130,15 +129,6 @@ namespace MaxEntRunner
                 Enabled = false
             };
             viewImageButton.Click += ViewImageButton_Click;
-
-            baselineQuickRunButton = new Button
-            {
-                Text = "Baseline Training (CartPole) Min",
-                AutoSize = true,
-                AutoSizeMode = AutoSizeMode.GrowAndShrink,
-                Visible = false
-            };
-            baselineQuickRunButton.Click += BaselineQuickRunButton_Click;
 
             baselineDefaultsButton = new Button
             {
@@ -234,7 +224,6 @@ namespace MaxEntRunner
             buttonPanel.Controls.Add(runButton);
             buttonPanel.Controls.Add(stopButton);
             buttonPanel.Controls.Add(viewImageButton);
-            buttonPanel.Controls.Add(baselineQuickRunButton);
             buttonPanel.Controls.Add(baselineDefaultsButton);
             buttonPanel.Controls.Add(baselineMinimumsButton);
             buttonPanel.Controls.Add(selectAllButton);
@@ -332,8 +321,8 @@ namespace MaxEntRunner
             y += paramPanel.Height + lineGap;
 
             buttonPanel.Location = new Point(x, y);
-            int buttonHeight = Math.Max(runButton.Height, stopButton.Height) + 8;
-            buttonPanel.Size = new Size(width90, buttonHeight);
+            buttonPanel.MaximumSize = new Size(width90, 0);
+            buttonPanel.Size = new Size(width90, buttonPanel.PreferredSize.Height);
             y += buttonPanel.Height + lineGap;
 
             outputLabel.Location = new Point(x, y);
@@ -479,7 +468,6 @@ namespace MaxEntRunner
 
             var script = config.scripts[scriptDropdown.SelectedIndex];
             descriptionBox.Text = script.description;
-            baselineQuickRunButton.Visible = script.name == "Baseline Training (CartPole)";
             baselineDefaultsButton.Enabled = script.name == "Baseline Training (CartPole)";
             baselineMinimumsButton.Enabled = script.name == "Baseline Training (CartPole)";
 
@@ -517,19 +505,6 @@ namespace MaxEntRunner
             viewImageButton.Enabled = !string.IsNullOrEmpty(script.outputImage) && !stopButton.Enabled;
         }
 
-        private void BaselineQuickRunButton_Click(object? sender, EventArgs e)
-        {
-            if (config == null || scriptDropdown.SelectedIndex < 0) return;
-            var script = config.scripts[scriptDropdown.SelectedIndex];
-            if (script.name != "Baseline Training (CartPole)") return;
-
-            if (paramTextBoxes.TryGetValue("env", out var envBox)) envBox.Text = "CartPole-v1";
-            if (paramTextBoxes.TryGetValue("T", out var tBox)) tBox.Text = "100";
-            if (paramTextBoxes.TryGetValue("train_steps", out var trainBox)) trainBox.Text = "50";
-            if (paramTextBoxes.TryGetValue("episodes", out var episodesBox)) episodesBox.Text = "5";
-            if (paramTextBoxes.TryGetValue("epochs", out var epochsBox)) epochsBox.Text = "2";
-            if (paramTextBoxes.TryGetValue("exp_name", out var expBox)) expBox.Text = "test";
-        }
 
         private void BaselineMinimumsButton_Click(object? sender, EventArgs e)
         {
