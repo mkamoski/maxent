@@ -95,6 +95,10 @@ def heatmap(running_avg_p, avg_p, i, env):
 
 
 def heatmap4(running_avg_ps, running_avg_ps_baseline, indexes=[0,1,2,3]):
+    max_index = min(len(running_avg_ps), len(running_avg_ps_baseline)) - 1
+    if max_index < 0:
+        return
+    indexes = [idx for idx in indexes if idx <= max_index]
     plt.figure()
     row1 = [plt.subplot(241), plt.subplot(242), plt.subplot(243), plt.subplot(244)]
     row2 = [plt.subplot(245), plt.subplot(246), plt.subplot(247), plt.subplot(248)]
