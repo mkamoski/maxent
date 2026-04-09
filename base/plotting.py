@@ -27,9 +27,13 @@ def get_next_file(directory, model_time, ext, dot=".png"):
 def state_coverage_curve(coverage_values):
     fname = FIG_DIR + model_time + "state_coverage.png"
     plt.figure()
-    plt.plot(np.arange(len(coverage_values)), coverage_values)
+    epochs = np.arange(len(coverage_values))
+    plt.plot(epochs, coverage_values, marker="o", color="tab:blue", label="State Coverage")
+    for idx, value in enumerate(coverage_values, start=1):
+        plt.text(idx - 1, value, f"e{idx}")
     plt.xlabel("Epoch")
     plt.ylabel("States Visited")
+    plt.legend()
     plt.savefig(fname)
     plt.close()
 
