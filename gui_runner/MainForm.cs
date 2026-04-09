@@ -18,6 +18,8 @@ namespace MaxEntRunner
         private Button runButton = null!;
         private Button stopButton = null!;
         private Button viewImageButton = null!;
+        private Button baselineQuickRunButton = null!;
+        private Button baselineDefaultsButton = null!;
         private Button selectAllButton = null!;
         private Button copyButton = null!;
         private Button saveOutputButton = null!;
@@ -72,7 +74,7 @@ namespace MaxEntRunner
             descriptionBox = new TextBox
             {
                 Location = new Point(10, 60),
-                Size = new Size((int)(this.ClientSize.Width * 0.9) - 10, 40),
+                Size = new Size((int)(this.ClientSize.Width * 0.9) - 10, 60),
                 Multiline = true,
                 ReadOnly = true,
                 BackColor = SystemColors.Control
@@ -127,6 +129,24 @@ namespace MaxEntRunner
                 Enabled = false
             };
             viewImageButton.Click += ViewImageButton_Click;
+
+            baselineQuickRunButton = new Button
+            {
+                Text = "Baseline Training (CartPole) Min",
+                AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                Visible = false
+            };
+            baselineQuickRunButton.Click += BaselineQuickRunButton_Click;
+
+            baselineDefaultsButton = new Button
+            {
+                Text = "Baseling Training (CartPole) Defaults",
+                AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                Enabled = false
+            };
+            baselineDefaultsButton.Click += BaselineDefaultsButton_Click;
 
             selectAllButton = new Button
             {
@@ -204,6 +224,8 @@ namespace MaxEntRunner
             buttonPanel.Controls.Add(runButton);
             buttonPanel.Controls.Add(stopButton);
             buttonPanel.Controls.Add(viewImageButton);
+            buttonPanel.Controls.Add(baselineQuickRunButton);
+            buttonPanel.Controls.Add(baselineDefaultsButton);
             buttonPanel.Controls.Add(selectAllButton);
             buttonPanel.Controls.Add(copyButton);
             buttonPanel.Controls.Add(saveOutputButton);
@@ -446,6 +468,8 @@ namespace MaxEntRunner
 
             var script = config.scripts[scriptDropdown.SelectedIndex];
             descriptionBox.Text = script.description;
+            baselineQuickRunButton.Visible = script.name == "Baseline Training (CartPole)";
+            baselineDefaultsButton.Enabled = script.name == "Baseline Training (CartPole)";
 
             // Clear and rebuild parameter controls
             paramPanel.Controls.Clear();
@@ -479,6 +503,34 @@ namespace MaxEntRunner
 
             // Enable view button if script has output image
             viewImageButton.Enabled = !string.IsNullOrEmpty(script.outputImage) && !stopButton.Enabled;
+        }
+
+        private void BaselineQuickRunButton_Click(object? sender, EventArgs e)
+        {
+            if (config == null || scriptDropdown.SelectedIndex < 0) return;
+            var script = config.scripts[scriptDropdown.SelectedIndex];
+            if (script.name != "Baseline Training (CartPole)") return;
+
+            if (paramTextBoxes.TryGetValue("env", out var envBox)) envBox.Text = "CartPole-v1";
+            if (paramTextBoxes.TryGetValue("T", out var tBox)) tBox.Text = "100";
+            if (paramTextBoxes.TryGetValue("train_steps", out var trainBox)) trainBox.Text = "50";
+            if (paramTextBoxes.TryGetValue("episodes", out var episodesBox)) episodesBox.Text = "5";
+            if (paramTextBoxes.TryGetValue("epochs", out var epochsBox)) epochsBox.Text = "2";
+            if (paramTextBoxes.TryGetValue("exp_name", out var expBox)) expBox.Text = "test";
+        }
+
+        private void BaselineDefaultsButton_Click(object? sender, EventArgs e)
+        {
+            if (config == null || scriptDropdown.SelectedIndex < 0) return;
+            var script = config.scripts[scriptDropdown.SelectedIndex];
+            if (script.name != "Baseline Training (CartPole)") return;
+
+            if (paramTextBoxes.TryGetValue("env", out var envBox)) envBox.Text = "CartPole-v1";
+            if (paramTextBoxes.TryGetValue("T", out var tBox)) tBox.Text = "200";
+            if (paramTextBoxes.TryGetValue("train_steps", out var trainBox)) trainBox.Text = "100";
+            if (paramTextBoxes.TryGetValue("episodes", out var episodesBox)) episodesBox.Text = "50";
+            if (paramTextBoxes.TryGetValue("epochs", out var epochsBox)) epochsBox.Text = "50";
+            if (paramTextBoxes.TryGetValue("exp_name", out var expBox)) expBox.Text = "test";
         }
 
         private void SetUiRunning(bool isRunning)

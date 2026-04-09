@@ -32,7 +32,7 @@
     {
       "name": "Baseline Training (CartPole)",
       "file": "..\\base\\collect_baseline.py",
-      "description": "Overview: Train entropy-based policy on classic control (Time estimate: 60 minutes for default settings)",
+      "description": "Overview: Train entropy-based policy on classic control (Time estimate: 60 minutes for default settings).\r\nParams: Environment = Gym env ID; Time Steps = rollout steps per policy; Training Steps = steps per episode; Episodes = episodes per epoch; Epochs = number of policies trained; Experiment Name = log/run name.",
       "parameters": [
         {"name": "env", "label": "Environment", "default": "CartPole-v1"},
         {"name": "T", "label": "Time Steps", "default": "200"},
