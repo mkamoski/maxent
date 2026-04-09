@@ -70,6 +70,8 @@ def init_state(env):
         return [np.pi, 0] 
     elif env == "MountainCarContinuous-v0":
         return [-0.50, 0]
+    elif env == "CartPole-v1":
+        return [0, 0, 0, 0]
 
 # Main loop of maximum entropy program. Iteratively collect 
 # and learn T policies using policy gradients and a reward function 
