@@ -41,7 +41,7 @@
         {"name": "epochs", "label": "Epochs", "default": "10"},
         {"name": "exp_name", "label": "Experiment Name", "default": "test"}
       ],
-      "outputImage": null
+      "outputImage": "..\\figs\\CartPole-v1\\test\\state_coverage.png"
     },
     {
       "name": "Ant Training (SAC)",

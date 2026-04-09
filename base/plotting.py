@@ -24,6 +24,15 @@ def get_next_file(directory, model_time, ext, dot=".png"):
         i += 1
     return fname
 
+def state_coverage_curve(coverage_values):
+    fname = FIG_DIR + model_time + "state_coverage.png"
+    plt.figure()
+    plt.plot(np.arange(len(coverage_values)), coverage_values)
+    plt.xlabel("Epoch")
+    plt.ylabel("States Visited")
+    plt.savefig(fname)
+    plt.close()
+
 def running_average_entropy(running_avg_entropies, running_avg_entropies_baseline):
     fname = get_next_file(FIG_DIR, model_time, "running_avg", ".png")
     plt.figure()
