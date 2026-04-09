@@ -516,7 +516,7 @@ namespace MaxEntRunner
             if (paramTextBoxes.TryGetValue("T", out var tBox)) tBox.Text = "100";
             if (paramTextBoxes.TryGetValue("train_steps", out var trainBox)) trainBox.Text = "50";
             if (paramTextBoxes.TryGetValue("episodes", out var episodesBox)) episodesBox.Text = "5";
-            if (paramTextBoxes.TryGetValue("epochs", out var epochsBox)) epochsBox.Text = "2";
+            if (paramTextBoxes.TryGetValue("epochs", out var epochsBox)) epochsBox.Text = "3";
             if (paramTextBoxes.TryGetValue("exp_name", out var expBox)) expBox.Text = "test";
         }
 
