@@ -545,6 +545,17 @@ namespace MaxEntRunner
             copyButton.Enabled = !isRunning;
             saveOutputButton.Enabled = !isRunning;
             openOutputButton.Enabled = !isRunning;
+            baselineDefaultsButton.Enabled = !isRunning && scriptDropdown.SelectedIndex >= 0
+                && config?.scripts[scriptDropdown.SelectedIndex].name == "Baseline Training (CartPole)";
+            baselineMinimumsButton.Enabled = !isRunning && scriptDropdown.SelectedIndex >= 0
+                && config?.scripts[scriptDropdown.SelectedIndex].name == "Baseline Training (CartPole)";
+
+            descriptionBox.Enabled = !isRunning;
+            outputBox.Enabled = !isRunning;
+            foreach (var textBox in paramTextBoxes.Values)
+            {
+                textBox.Enabled = !isRunning;
+            }
 
             bool hasOutputImage = false;
             if (config != null && scriptDropdown.SelectedIndex >= 0)
