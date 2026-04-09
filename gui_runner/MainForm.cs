@@ -20,6 +20,7 @@ namespace MaxEntRunner
         private Button viewImageButton = null!;
         private Button baselineQuickRunButton = null!;
         private Button baselineDefaultsButton = null!;
+        private Button baselineMinimumsButton = null!;
         private Button selectAllButton = null!;
         private Button copyButton = null!;
         private Button saveOutputButton = null!;
@@ -100,7 +101,7 @@ namespace MaxEntRunner
             buttonPanel = new FlowLayoutPanel
             {
                 AutoSize = false,
-                WrapContents = false,
+                WrapContents = true,
                 FlowDirection = FlowDirection.LeftToRight
             };
 
@@ -147,6 +148,15 @@ namespace MaxEntRunner
                 Enabled = false
             };
             baselineDefaultsButton.Click += BaselineDefaultsButton_Click;
+
+            baselineMinimumsButton = new Button
+            {
+                Text = "Baseline Training (CartPole) Minimums",
+                AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                Enabled = false
+            };
+            baselineMinimumsButton.Click += BaselineMinimumsButton_Click;
 
             selectAllButton = new Button
             {
@@ -226,6 +236,7 @@ namespace MaxEntRunner
             buttonPanel.Controls.Add(viewImageButton);
             buttonPanel.Controls.Add(baselineQuickRunButton);
             buttonPanel.Controls.Add(baselineDefaultsButton);
+            buttonPanel.Controls.Add(baselineMinimumsButton);
             buttonPanel.Controls.Add(selectAllButton);
             buttonPanel.Controls.Add(copyButton);
             buttonPanel.Controls.Add(saveOutputButton);
@@ -470,6 +481,7 @@ namespace MaxEntRunner
             descriptionBox.Text = script.description;
             baselineQuickRunButton.Visible = script.name == "Baseline Training (CartPole)";
             baselineDefaultsButton.Enabled = script.name == "Baseline Training (CartPole)";
+            baselineMinimumsButton.Enabled = script.name == "Baseline Training (CartPole)";
 
             // Clear and rebuild parameter controls
             paramPanel.Controls.Clear();
@@ -506,6 +518,20 @@ namespace MaxEntRunner
         }
 
         private void BaselineQuickRunButton_Click(object? sender, EventArgs e)
+        {
+            if (config == null || scriptDropdown.SelectedIndex < 0) return;
+            var script = config.scripts[scriptDropdown.SelectedIndex];
+            if (script.name != "Baseline Training (CartPole)") return;
+
+            if (paramTextBoxes.TryGetValue("env", out var envBox)) envBox.Text = "CartPole-v1";
+            if (paramTextBoxes.TryGetValue("T", out var tBox)) tBox.Text = "100";
+            if (paramTextBoxes.TryGetValue("train_steps", out var trainBox)) trainBox.Text = "50";
+            if (paramTextBoxes.TryGetValue("episodes", out var episodesBox)) episodesBox.Text = "5";
+            if (paramTextBoxes.TryGetValue("epochs", out var epochsBox)) epochsBox.Text = "2";
+            if (paramTextBoxes.TryGetValue("exp_name", out var expBox)) expBox.Text = "test";
+        }
+
+        private void BaselineMinimumsButton_Click(object? sender, EventArgs e)
         {
             if (config == null || scriptDropdown.SelectedIndex < 0) return;
             var script = config.scripts[scriptDropdown.SelectedIndex];
