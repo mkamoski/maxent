@@ -132,7 +132,7 @@ namespace MaxEntRunner
 
             baselineDefaultsButton = new Button
             {
-                Text = "Baseling Training (CartPole) Defaults",
+                Text = "Baseline Training (CartPole) Defaults",
                 AutoSize = true,
                 AutoSizeMode = AutoSizeMode.GrowAndShrink,
                 Enabled = false
@@ -468,8 +468,11 @@ namespace MaxEntRunner
 
             var script = config.scripts[scriptDropdown.SelectedIndex];
             descriptionBox.Text = script.description;
-            baselineDefaultsButton.Enabled = script.name == "Baseline Training (CartPole)";
-            baselineMinimumsButton.Enabled = script.name == "Baseline Training (CartPole)";
+            bool isBaselineCartpole = script.name == "Baseline Training (CartPole)";
+            baselineDefaultsButton.Visible = isBaselineCartpole;
+            baselineMinimumsButton.Visible = isBaselineCartpole;
+            baselineDefaultsButton.Enabled = isBaselineCartpole;
+            baselineMinimumsButton.Enabled = isBaselineCartpole;
 
             // Clear and rebuild parameter controls
             paramPanel.Controls.Clear();
@@ -545,10 +548,10 @@ namespace MaxEntRunner
             copyButton.Enabled = !isRunning;
             saveOutputButton.Enabled = !isRunning;
             openOutputButton.Enabled = !isRunning;
-            baselineDefaultsButton.Enabled = !isRunning && scriptDropdown.SelectedIndex >= 0
+            bool isBaselineCartpole = !isRunning && scriptDropdown.SelectedIndex >= 0
                 && config?.scripts[scriptDropdown.SelectedIndex].name == "Baseline Training (CartPole)";
-            baselineMinimumsButton.Enabled = !isRunning && scriptDropdown.SelectedIndex >= 0
-                && config?.scripts[scriptDropdown.SelectedIndex].name == "Baseline Training (CartPole)";
+            baselineDefaultsButton.Enabled = isBaselineCartpole;
+            baselineMinimumsButton.Enabled = isBaselineCartpole;
 
             descriptionBox.Enabled = !isRunning;
             outputBox.Enabled = !isRunning;
