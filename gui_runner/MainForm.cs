@@ -31,8 +31,6 @@ namespace MaxEntRunner
         private Label buildInfoLabel = null!;
         private Label scriptStartedLabel = null!;
         private Label scriptEndedLabel = null!;
-        private Label outputLabel = null!;
-        private Label imageLabel = null!;
         private RichTextBox outputBox = null!;
         private PictureBox imageBox = null!;
         private Process? currentProcess;
@@ -202,7 +200,6 @@ namespace MaxEntRunner
             runTimer.Tick += RunTimer_Tick;
 
             // Output box (25% of height, positioned after buttons)
-            outputLabel = new Label { Text = "Console Output:", AutoSize = true };
             int outputHeight = (int)(this.ClientSize.Height * 0.2);
             outputBox = new RichTextBox
             {
@@ -213,7 +210,6 @@ namespace MaxEntRunner
             };
 
             // Image preview (25% of height, positioned after output)
-            imageLabel = new Label { Text = "Output Image:", AutoSize = true };
             int imageHeight = (int)(this.ClientSize.Height * 0.2);
             imageBox = new PictureBox
             {
@@ -245,9 +241,7 @@ namespace MaxEntRunner
             this.Controls.Add(documentationDropdown);
             this.Controls.Add(paramPanel);
             this.Controls.Add(buttonPanel);
-            this.Controls.Add(outputLabel);
             this.Controls.Add(outputBox);
-            this.Controls.Add(imageLabel);
             this.Controls.Add(imageBox);
 
             UpdateBuildInfoLabel();
@@ -325,21 +319,18 @@ namespace MaxEntRunner
             buttonPanel.Size = new Size(width90, buttonPanel.PreferredSize.Height);
             y += buttonPanel.Height + lineGap;
 
-            outputLabel.Location = new Point(x, y);
-            y += outputLabel.Height + 4;
+            int totalWidth = width90 - 10;
+            int outputWidth = (int)(totalWidth * 0.8);
+            int imageWidth = Math.Max(80, totalWidth - outputWidth - 10);
 
-            int remainingHeight = this.ClientSize.Height - y - (outputLabel.Height + 4) - (imageLabel.Height + 4) - lineGap;
-            int boxHeight = Math.Max(80, remainingHeight / 2);
+            int remainingHeight = this.ClientSize.Height - y - lineGap;
+            int boxHeight = Math.Max(60, (int)(remainingHeight * 0.7));
 
             outputBox.Location = new Point(x, y);
-            outputBox.Size = new Size(width90 - 10, boxHeight);
-            y += outputBox.Height + lineGap;
+            outputBox.Size = new Size(outputWidth, boxHeight);
 
-            imageLabel.Location = new Point(x, y);
-            y += imageLabel.Height + 4;
-
-            imageBox.Location = new Point(x, y);
-            imageBox.Size = new Size(width90 - 10, boxHeight);
+            imageBox.Location = new Point(x + outputWidth + 10, y);
+            imageBox.Size = new Size(imageWidth, boxHeight);
         }
 
         private string FindRepoRoot()
