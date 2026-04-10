@@ -66,6 +66,8 @@ gym==0.17.3                 # OpenAI Gym (base version, may need custom fork)
 # MuJoCo Physics Engine
 # mujoco-py==2.0.2.13       # COMMENTED OUT - Requires MuJoCo binaries installed first
 # Note: Install MuJoCo binaries manually first, then uncomment and install mujoco-py
+# Cython pin required for mujoco-py builds on Python 3.7
+Cython==0.29.36
 # See: https://github.com/openai/mujoco-py#install-mujoco
 
 # Video Processing (for video recording in environments)
