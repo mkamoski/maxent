@@ -2,12 +2,14 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace MaxEntRunner
 {
     public partial class MainForm : Form
     {
         private ScriptConfig? config;
+        private AppSettingsFile? appSettings;
         private Label scriptLabel = null!;
         private ComboBox scriptDropdown = null!;
         private TextBox descriptionBox = null!;
@@ -41,6 +43,7 @@ namespace MaxEntRunner
         {
             InitializeComponent();
             LoadConfig();
+            LoadAppSettings();
         }
 
         private void InitializeComponent()
@@ -190,8 +193,8 @@ namespace MaxEntRunner
                 Size = new Size(80, 25),
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
-            timeoutDropdown.Items.AddRange(new object[] { "15", "30", "45", "60", "75", "90", "105", "120", "240" });
-            timeoutDropdown.SelectedItem = "240";
+            timeoutDropdown.Items.AddRange(new object[] { "15", "30", "45", "60", "75", "90", "105", "120", "240", "1440" });
+            timeoutDropdown.SelectedItem = "1440";
 
             runTimer = new System.Windows.Forms.Timer
             {
@@ -208,6 +211,7 @@ namespace MaxEntRunner
                 BackColor = Color.Black,
                 ForeColor = Color.Lime
             };
+            outputBox.EnabledChanged += OutputBox_EnabledChanged;
 
             // Image preview (25% of height, positioned after output)
             int imageHeight = (int)(this.ClientSize.Height * 0.2);
@@ -411,6 +415,132 @@ namespace MaxEntRunner
             public override string ToString() => Path;
         }
 
+        private sealed class AppSettingEntry
+        {
+            [JsonPropertyName("name")]
+            public string Name { get; set; } = string.Empty;
+
+            [JsonPropertyName("default")]
+            public string Default { get; set; } = string.Empty;
+
+            [JsonPropertyName("user")]
+            public string User { get; set; } = string.Empty;
+        }
+
+        private sealed class AppSettingsFile
+        {
+            [JsonPropertyName("settings")]
+            public List<AppSettingEntry> Settings { get; set; } = new();
+        }
+
+        private void LoadAppSettings()
+        {
+            try
+            {
+                string settingsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AppSettings.json");
+                appSettings = File.Exists(settingsPath)
+                    ? JsonSerializer.Deserialize<AppSettingsFile>(File.ReadAllText(settingsPath))
+                    : null;
+
+                string pythonPath = string.Empty;
+                if (config != null)
+                {
+                    string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+                    string repoRoot = FindRepoRoot();
+                    pythonPath = ResolvePath(baseDir, config.pythonPath, repoRoot);
+                }
+
+                var computedDefaults = BuildComputedSettings(settingsPath, pythonPath);
+
+                if (appSettings == null)
+                {
+                    appSettings = new AppSettingsFile
+                    {
+                        Settings = computedDefaults
+                            .Select(item => new AppSettingEntry
+                            {
+                                Name = item.Key,
+                                Default = item.Value,
+                                User = string.Empty
+                            })
+                            .ToList()
+                    };
+                    File.WriteAllText(settingsPath, JsonSerializer.Serialize(appSettings, new JsonSerializerOptions { WriteIndented = true }));
+                }
+                else
+                {
+                    bool updated = false;
+                    foreach (var setting in appSettings.Settings)
+                    {
+                        if (string.IsNullOrWhiteSpace(setting.Default)
+                            && computedDefaults.TryGetValue(setting.Name, out var value)
+                            && !string.IsNullOrWhiteSpace(value))
+                        {
+                            setting.Default = value;
+                            updated = true;
+                        }
+                    }
+
+                    if (updated)
+                    {
+                        File.WriteAllText(settingsPath, JsonSerializer.Serialize(appSettings, new JsonSerializerOptions { WriteIndented = true }));
+                    }
+                }
+
+                AppendOutput("App settings:\n", Color.Cyan);
+                foreach (var setting in appSettings.Settings)
+                {
+                    string computedValue = computedDefaults.TryGetValue(setting.Name, out var value) ? value : string.Empty;
+                    string resolved = !string.IsNullOrWhiteSpace(setting.User)
+                        ? setting.User
+                        : !string.IsNullOrWhiteSpace(setting.Default)
+                            ? setting.Default
+                            : computedValue;
+
+                    if (string.IsNullOrWhiteSpace(resolved))
+                    {
+                        resolved = "unknown";
+                    }
+
+                    AppendOutput($"  {setting.Name}: {resolved}\n", Color.Cyan);
+                }
+
+                AppendOutput("\n", Color.Cyan);
+            }
+            catch (Exception ex)
+            {
+                AppendOutput($"Failed to load app settings: {ex.Message}\n", Color.Yellow);
+            }
+        }
+
+        private Dictionary<string, string> BuildComputedSettings(string settingsPath, string pythonPath)
+        {
+            string pythonRoot = string.IsNullOrWhiteSpace(pythonPath) ? string.Empty : Path.GetDirectoryName(pythonPath) ?? string.Empty;
+            string pythonVersion = string.Empty;
+            if (File.Exists(pythonPath))
+            {
+                var versionInfo = FileVersionInfo.GetVersionInfo(pythonPath);
+                pythonVersion = versionInfo.ProductVersion ?? versionInfo.FileVersion ?? string.Empty;
+            }
+
+            string mujocoPath = Environment.GetEnvironmentVariable("MUJOCO_PY_MUJOCO_PATH")
+                ?? Environment.GetEnvironmentVariable("MUJOCO_PATH")
+                ?? string.Empty;
+            string mujocoVersion = Environment.GetEnvironmentVariable("MUJOCO_PY_MUJOCO_VERSION")
+                ?? Environment.GetEnvironmentVariable("MUJOCO_VERSION")
+                ?? string.Empty;
+
+            return new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["PythonVersion"] = pythonVersion,
+                ["PythonRootPath"] = pythonRoot,
+                ["MuJoCoVersion"] = mujocoVersion,
+                ["MuJoCoPath"] = mujocoPath,
+                ["AppSettingsFileName"] = Path.GetFileName(settingsPath),
+                ["AppSettingsFullPath"] = settingsPath
+            };
+        }
+
         private void LoadDocumentationList()
         {
             documentationDropdown.Items.Clear();
@@ -545,7 +675,6 @@ namespace MaxEntRunner
             baselineMinimumsButton.Enabled = isBaselineCartpole;
 
             descriptionBox.Enabled = !isRunning;
-            outputBox.Enabled = !isRunning;
             foreach (var textBox in paramTextBoxes.Values)
             {
                 textBox.Enabled = !isRunning;
@@ -582,7 +711,9 @@ namespace MaxEntRunner
             {
                 SetUiRunning(true);
                 outputBox.Clear();
+                imageBox.Image?.Dispose();
                 imageBox.Image = null;
+                imageBox.Refresh();
 
                 runStartTime = DateTime.Now;
                 SetScriptStarted(runStartTime.Value);
@@ -806,7 +937,7 @@ namespace MaxEntRunner
         {
             if (timeoutDropdown.SelectedItem == null) return 0;
             if (!int.TryParse(timeoutDropdown.SelectedItem.ToString(), out int minutes)) return 0;
-            return Math.Clamp(minutes, 15, 240);
+            return Math.Clamp(minutes, 15, 1440);
         }
 
         private void ForceStopCurrentProcess(string reason)
@@ -902,6 +1033,12 @@ namespace MaxEntRunner
             outputBox.AppendText(text);
             outputBox.SelectionColor = outputBox.ForeColor;
             outputBox.ScrollToCaret();
+        }
+
+        private void OutputBox_EnabledChanged(object? sender, EventArgs e)
+        {
+            outputBox.BackColor = Color.Black;
+            outputBox.ForeColor = Color.Lime;
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
