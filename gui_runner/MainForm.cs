@@ -467,6 +467,25 @@ namespace MaxEntRunner
                     };
                     File.WriteAllText(settingsPath, JsonSerializer.Serialize(appSettings, new JsonSerializerOptions { WriteIndented = true }));
                 }
+                else
+                {
+                    bool updated = false;
+                    foreach (var setting in appSettings.Settings)
+                    {
+                        if (string.IsNullOrWhiteSpace(setting.Default)
+                            && computedDefaults.TryGetValue(setting.Name, out var value)
+                            && !string.IsNullOrWhiteSpace(value))
+                        {
+                            setting.Default = value;
+                            updated = true;
+                        }
+                    }
+
+                    if (updated)
+                    {
+                        File.WriteAllText(settingsPath, JsonSerializer.Serialize(appSettings, new JsonSerializerOptions { WriteIndented = true }));
+                    }
+                }
 
                 AppendOutput("App settings:\n", Color.Cyan);
                 foreach (var setting in appSettings.Settings)
