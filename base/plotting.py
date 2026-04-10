@@ -24,6 +24,19 @@ def get_next_file(directory, model_time, ext, dot=".png"):
         i += 1
     return fname
 
+def state_coverage_curve(coverage_values):
+    fname = FIG_DIR + model_time + "state_coverage.png"
+    plt.figure()
+    epochs = np.arange(len(coverage_values))
+    plt.plot(epochs, coverage_values, marker="o", color="tab:blue", label="State Coverage")
+    for idx, value in enumerate(coverage_values, start=1):
+        plt.text(idx - 1, value, f"e{idx}")
+    plt.xlabel("Epoch")
+    plt.ylabel("States Visited")
+    plt.legend()
+    plt.savefig(fname)
+    plt.close()
+
 def running_average_entropy(running_avg_entropies, running_avg_entropies_baseline):
     fname = get_next_file(FIG_DIR, model_time, "running_avg", ".png")
     plt.figure()
@@ -131,6 +144,10 @@ def heatmap4(running_avg_ps, running_avg_ps_baseline, indexes=[0,1,2,3]):
     # plt.show()
 
 def heatmap3x4(running_avg_ps, running_avg_ps_online, running_avg_ps_baseline, indexes=[0,1,2,3]):
+    max_index = min(len(running_avg_ps), len(running_avg_ps_online), len(running_avg_ps_baseline)) - 1
+    if max_index < 0:
+        return
+    indexes = [idx for idx in indexes if idx <= max_index]
     plt.figure()
     row1 = [plt.subplot(3,4,1), plt.subplot(3,4,2), plt.subplot(3,4,3), plt.subplot(3,4,4)]
     row2 = [plt.subplot(3,4,5), plt.subplot(3,4,6), plt.subplot(3,4,7), plt.subplot(3,4,8)]
@@ -138,21 +155,30 @@ def heatmap3x4(running_avg_ps, running_avg_ps_online, running_avg_ps_baseline, i
 
     # TODO: colorbar for the global figure
     for idx, ax in zip(indexes,row1):
-        min_value = np.min(np.ma.log(running_avg_ps[idx]))
-        ax.imshow(np.ma.log(running_avg_ps[idx]).filled(min_value), interpolation='spline16', cmap='Blues')
+        plot_data = running_avg_ps[idx]
+        if plot_data.ndim > 2:
+            plot_data = plot_data.sum(axis=tuple(range(2, plot_data.ndim)))
+        min_value = np.min(np.ma.log(plot_data))
+        ax.imshow(np.ma.log(plot_data).filled(min_value), interpolation='spline16', cmap='Blues')
         ax.set_title("Epoch %d" % idx)
         ax.xaxis.set_ticks([])
         ax.yaxis.set_ticks([])
 
     for idx, ax in zip(indexes,row2):
-        min_value = np.min(np.ma.log(running_avg_ps_online[idx]))
-        ax.imshow(np.ma.log(running_avg_ps_online[idx]).filled(min_value), interpolation='spline16', cmap='Greens')
+        plot_data = running_avg_ps_online[idx]
+        if plot_data.ndim > 2:
+            plot_data = plot_data.sum(axis=tuple(range(2, plot_data.ndim)))
+        min_value = np.min(np.ma.log(plot_data))
+        ax.imshow(np.ma.log(plot_data).filled(min_value), interpolation='spline16', cmap='Greens')
         ax.xaxis.set_ticks([])
         ax.yaxis.set_ticks([])
     
     for idx, ax in zip(indexes,row3):
-        min_value = np.min(np.ma.log(running_avg_ps_baseline[idx]))
-        ax.imshow(np.ma.log(running_avg_ps_baseline[idx]).filled(min_value), interpolation='spline16', cmap='Oranges')
+        plot_data = running_avg_ps_baseline[idx]
+        if plot_data.ndim > 2:
+            plot_data = plot_data.sum(axis=tuple(range(2, plot_data.ndim)))
+        min_value = np.min(np.ma.log(plot_data))
+        ax.imshow(np.ma.log(plot_data).filled(min_value), interpolation='spline16', cmap='Oranges')
         ax.xaxis.set_ticks([])
         ax.yaxis.set_ticks([])
 

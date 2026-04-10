@@ -107,6 +107,8 @@ def collect_entropy_policies(env, epochs, T, MODEL_DIR):
     running_avg_entropies_baseline = []
     running_avg_ps_baseline = []
 
+    state_coverage = []
+
     online_average_ps = []
     
     policies = []
@@ -210,6 +212,8 @@ def collect_entropy_policies(env, epochs, T, MODEL_DIR):
         running_avg_entropies_baseline.append(running_avg_ent_baseline)
         running_avg_ps_baseline.append(running_avg_p_baseline) 
 
+        state_coverage.append(int(np.count_nonzero(average_p)))
+
         print("--------------------------------")
         print("p=")
         print(p)
@@ -241,6 +245,7 @@ def collect_entropy_policies(env, epochs, T, MODEL_DIR):
 
     plotting.running_average_entropy(running_avg_entropies, running_avg_entropies_baseline)
     plotting.running_average_entropy3(running_avg_entropies, running_avg_entropies_baseline, running_avg_entropies_online)
+    plotting.state_coverage_curve(state_coverage)
 
     indexes = [1,2,5,10]
     plotting.heatmap4(running_avg_ps, running_avg_ps_baseline, indexes)

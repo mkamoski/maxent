@@ -18,6 +18,8 @@ namespace MaxEntRunner
         private Button runButton = null!;
         private Button stopButton = null!;
         private Button viewImageButton = null!;
+        private Button baselineDefaultsButton = null!;
+        private Button baselineMinimumsButton = null!;
         private Button selectAllButton = null!;
         private Button copyButton = null!;
         private Button saveOutputButton = null!;
@@ -29,8 +31,6 @@ namespace MaxEntRunner
         private Label buildInfoLabel = null!;
         private Label scriptStartedLabel = null!;
         private Label scriptEndedLabel = null!;
-        private Label outputLabel = null!;
-        private Label imageLabel = null!;
         private RichTextBox outputBox = null!;
         private PictureBox imageBox = null!;
         private Process? currentProcess;
@@ -72,7 +72,7 @@ namespace MaxEntRunner
             descriptionBox = new TextBox
             {
                 Location = new Point(10, 60),
-                Size = new Size((int)(this.ClientSize.Width * 0.9) - 10, 40),
+                Size = new Size((int)(this.ClientSize.Width * 0.9) - 10, 60),
                 Multiline = true,
                 ReadOnly = true,
                 BackColor = SystemColors.Control
@@ -97,8 +97,8 @@ namespace MaxEntRunner
             int buttonY = 175 + paramHeight + 10;
             buttonPanel = new FlowLayoutPanel
             {
-                AutoSize = false,
-                WrapContents = false,
+                AutoSize = true,
+                WrapContents = true,
                 FlowDirection = FlowDirection.LeftToRight
             };
 
@@ -127,6 +127,24 @@ namespace MaxEntRunner
                 Enabled = false
             };
             viewImageButton.Click += ViewImageButton_Click;
+
+            baselineDefaultsButton = new Button
+            {
+                Text = "Baseline Training (CartPole) Defaults",
+                AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                Enabled = false
+            };
+            baselineDefaultsButton.Click += BaselineDefaultsButton_Click;
+
+            baselineMinimumsButton = new Button
+            {
+                Text = "Baseline Training (CartPole) Minimums",
+                AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                Enabled = false
+            };
+            baselineMinimumsButton.Click += BaselineMinimumsButton_Click;
 
             selectAllButton = new Button
             {
@@ -182,7 +200,6 @@ namespace MaxEntRunner
             runTimer.Tick += RunTimer_Tick;
 
             // Output box (25% of height, positioned after buttons)
-            outputLabel = new Label { Text = "Console Output:", AutoSize = true };
             int outputHeight = (int)(this.ClientSize.Height * 0.2);
             outputBox = new RichTextBox
             {
@@ -193,7 +210,6 @@ namespace MaxEntRunner
             };
 
             // Image preview (25% of height, positioned after output)
-            imageLabel = new Label { Text = "Output Image:", AutoSize = true };
             int imageHeight = (int)(this.ClientSize.Height * 0.2);
             imageBox = new PictureBox
             {
@@ -204,6 +220,8 @@ namespace MaxEntRunner
             buttonPanel.Controls.Add(runButton);
             buttonPanel.Controls.Add(stopButton);
             buttonPanel.Controls.Add(viewImageButton);
+            buttonPanel.Controls.Add(baselineDefaultsButton);
+            buttonPanel.Controls.Add(baselineMinimumsButton);
             buttonPanel.Controls.Add(selectAllButton);
             buttonPanel.Controls.Add(copyButton);
             buttonPanel.Controls.Add(saveOutputButton);
@@ -223,9 +241,7 @@ namespace MaxEntRunner
             this.Controls.Add(documentationDropdown);
             this.Controls.Add(paramPanel);
             this.Controls.Add(buttonPanel);
-            this.Controls.Add(outputLabel);
             this.Controls.Add(outputBox);
-            this.Controls.Add(imageLabel);
             this.Controls.Add(imageBox);
 
             UpdateBuildInfoLabel();
@@ -299,25 +315,22 @@ namespace MaxEntRunner
             y += paramPanel.Height + lineGap;
 
             buttonPanel.Location = new Point(x, y);
-            int buttonHeight = Math.Max(runButton.Height, stopButton.Height) + 8;
-            buttonPanel.Size = new Size(width90, buttonHeight);
+            buttonPanel.MaximumSize = new Size(width90, 0);
+            buttonPanel.Size = new Size(width90, buttonPanel.PreferredSize.Height);
             y += buttonPanel.Height + lineGap;
 
-            outputLabel.Location = new Point(x, y);
-            y += outputLabel.Height + 4;
+            int totalWidth = width90 - 10;
+            int outputWidth = (int)(totalWidth * 0.8);
+            int imageWidth = Math.Max(80, totalWidth - outputWidth - 10);
 
-            int remainingHeight = this.ClientSize.Height - y - (outputLabel.Height + 4) - (imageLabel.Height + 4) - lineGap;
-            int boxHeight = Math.Max(80, remainingHeight / 2);
+            int remainingHeight = this.ClientSize.Height - y - lineGap;
+            int boxHeight = Math.Max(60, (int)(remainingHeight * 0.7));
 
             outputBox.Location = new Point(x, y);
-            outputBox.Size = new Size(width90 - 10, boxHeight);
-            y += outputBox.Height + lineGap;
+            outputBox.Size = new Size(outputWidth, boxHeight);
 
-            imageLabel.Location = new Point(x, y);
-            y += imageLabel.Height + 4;
-
-            imageBox.Location = new Point(x, y);
-            imageBox.Size = new Size(width90 - 10, boxHeight);
+            imageBox.Location = new Point(x + outputWidth + 10, y);
+            imageBox.Size = new Size(imageWidth, boxHeight);
         }
 
         private string FindRepoRoot()
@@ -446,6 +459,11 @@ namespace MaxEntRunner
 
             var script = config.scripts[scriptDropdown.SelectedIndex];
             descriptionBox.Text = script.description;
+            bool isBaselineCartpole = script.name == "Baseline Training (CartPole)";
+            baselineDefaultsButton.Visible = isBaselineCartpole;
+            baselineMinimumsButton.Visible = isBaselineCartpole;
+            baselineDefaultsButton.Enabled = isBaselineCartpole;
+            baselineMinimumsButton.Enabled = isBaselineCartpole;
 
             // Clear and rebuild parameter controls
             paramPanel.Controls.Clear();
@@ -481,6 +499,35 @@ namespace MaxEntRunner
             viewImageButton.Enabled = !string.IsNullOrEmpty(script.outputImage) && !stopButton.Enabled;
         }
 
+
+        private void BaselineMinimumsButton_Click(object? sender, EventArgs e)
+        {
+            if (config == null || scriptDropdown.SelectedIndex < 0) return;
+            var script = config.scripts[scriptDropdown.SelectedIndex];
+            if (script.name != "Baseline Training (CartPole)") return;
+
+            if (paramTextBoxes.TryGetValue("env", out var envBox)) envBox.Text = "CartPole-v1";
+            if (paramTextBoxes.TryGetValue("T", out var tBox)) tBox.Text = "100";
+            if (paramTextBoxes.TryGetValue("train_steps", out var trainBox)) trainBox.Text = "50";
+            if (paramTextBoxes.TryGetValue("episodes", out var episodesBox)) episodesBox.Text = "5";
+            if (paramTextBoxes.TryGetValue("epochs", out var epochsBox)) epochsBox.Text = "3";
+            if (paramTextBoxes.TryGetValue("exp_name", out var expBox)) expBox.Text = "test";
+        }
+
+        private void BaselineDefaultsButton_Click(object? sender, EventArgs e)
+        {
+            if (config == null || scriptDropdown.SelectedIndex < 0) return;
+            var script = config.scripts[scriptDropdown.SelectedIndex];
+            if (script.name != "Baseline Training (CartPole)") return;
+
+            if (paramTextBoxes.TryGetValue("env", out var envBox)) envBox.Text = "CartPole-v1";
+            if (paramTextBoxes.TryGetValue("T", out var tBox)) tBox.Text = "200";
+            if (paramTextBoxes.TryGetValue("train_steps", out var trainBox)) trainBox.Text = "100";
+            if (paramTextBoxes.TryGetValue("episodes", out var episodesBox)) episodesBox.Text = "50";
+            if (paramTextBoxes.TryGetValue("epochs", out var epochsBox)) epochsBox.Text = "50";
+            if (paramTextBoxes.TryGetValue("exp_name", out var expBox)) expBox.Text = "test";
+        }
+
         private void SetUiRunning(bool isRunning)
         {
             runButton.Enabled = !isRunning;
@@ -492,6 +539,17 @@ namespace MaxEntRunner
             copyButton.Enabled = !isRunning;
             saveOutputButton.Enabled = !isRunning;
             openOutputButton.Enabled = !isRunning;
+            bool isBaselineCartpole = !isRunning && scriptDropdown.SelectedIndex >= 0
+                && config?.scripts[scriptDropdown.SelectedIndex].name == "Baseline Training (CartPole)";
+            baselineDefaultsButton.Enabled = isBaselineCartpole;
+            baselineMinimumsButton.Enabled = isBaselineCartpole;
+
+            descriptionBox.Enabled = !isRunning;
+            outputBox.Enabled = !isRunning;
+            foreach (var textBox in paramTextBoxes.Values)
+            {
+                textBox.Enabled = !isRunning;
+            }
 
             bool hasOutputImage = false;
             if (config != null && scriptDropdown.SelectedIndex >= 0)
