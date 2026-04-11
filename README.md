@@ -2,7 +2,7 @@
 
 **THIS IS MY CLONE OF THE ORIGINAL MAXENT PROJECT, WITH MY MODIFICATIONS TO GET IT TO RUN IN 2026, BECAUSE I DO NOT HAVE WRITE ACCESS TO THE ORIGINAL REPO**
 
-# Notes from ACK
+# Notes from ACK and etc
 
 Efficient Maximum-Entropy Exploration
 
@@ -20,7 +20,11 @@ https://github.com/abbyvansoest/maxent_base
 
 https://github.com/abbyvansoest/maxent
 
-All implemetations use a forked copy of OpenAI Gym available at: https://github.com/abbyvansoest/gym-fork and Changes were made to the graphics used for rendering and the behavior of state reseting.
+All implemetations use a forked copy of OpenAI Gym available at: 
+
+https://github.com/abbyvansoest/gym-fork 
+
+and Changes were made to the graphics used for rendering and the behavior of state reseting.
 
 Note that this code is memory-intensive. It is set up to run on a specialized deep-learning machine. To reduce the dimensionality, change the discretization setup in swimmer_utils.py.
 

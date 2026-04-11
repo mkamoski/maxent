@@ -22,6 +22,7 @@ namespace MaxEntRunner
         private Button viewImageButton = null!;
         private Button baselineDefaultsButton = null!;
         private Button baselineMinimumsButton = null!;
+        private Button checkPythonButton = null!;
         private Button selectAllButton = null!;
         private Button copyButton = null!;
         private Button saveOutputButton = null!;
@@ -149,6 +150,14 @@ namespace MaxEntRunner
             };
             baselineMinimumsButton.Click += BaselineMinimumsButton_Click;
 
+            checkPythonButton = new Button
+            {
+                Text = "CheckPython",
+                AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink
+            };
+            checkPythonButton.Click += CheckPythonButton_Click;
+
             selectAllButton = new Button
             {
                 Text = "Select All Output",
@@ -226,6 +235,7 @@ namespace MaxEntRunner
             buttonPanel.Controls.Add(viewImageButton);
             buttonPanel.Controls.Add(baselineDefaultsButton);
             buttonPanel.Controls.Add(baselineMinimumsButton);
+            buttonPanel.Controls.Add(checkPythonButton);
             buttonPanel.Controls.Add(selectAllButton);
             buttonPanel.Controls.Add(copyButton);
             buttonPanel.Controls.Add(saveOutputButton);
@@ -658,6 +668,40 @@ namespace MaxEntRunner
             if (paramTextBoxes.TryGetValue("exp_name", out var expBox)) expBox.Text = "test";
         }
 
+        private void CheckPythonButton_Click(object? sender, EventArgs e)
+        {
+            if (config == null)
+            {
+                AppendOutput("Python check skipped: ScriptConfig.json not loaded.\n", Color.Yellow);
+                return;
+            }
+
+            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            string repoRoot = FindRepoRoot();
+            string pythonPath = ResolvePath(baseDir, config.pythonPath, repoRoot);
+            string pythonRoot = Path.GetDirectoryName(pythonPath) ?? string.Empty;
+            string pythonVersion = string.Empty;
+
+            if (File.Exists(pythonPath))
+            {
+                var versionInfo = FileVersionInfo.GetVersionInfo(pythonPath);
+                pythonVersion = versionInfo.ProductVersion ?? versionInfo.FileVersion ?? string.Empty;
+            }
+
+            if (string.IsNullOrWhiteSpace(pythonVersion))
+            {
+                pythonVersion = "unknown";
+            }
+
+            if (string.IsNullOrWhiteSpace(pythonRoot))
+            {
+                pythonRoot = "unknown";
+            }
+
+            AppendOutput($"Python version: {pythonVersion}\n", Color.Cyan);
+            AppendOutput($"Python root: {pythonRoot}\n", Color.Cyan);
+        }
+
         private void SetUiRunning(bool isRunning)
         {
             runButton.Enabled = !isRunning;
@@ -669,6 +713,7 @@ namespace MaxEntRunner
             copyButton.Enabled = !isRunning;
             saveOutputButton.Enabled = !isRunning;
             openOutputButton.Enabled = !isRunning;
+            checkPythonButton.Enabled = !isRunning;
             bool isBaselineCartpole = !isRunning && scriptDropdown.SelectedIndex >= 0
                 && config?.scripts[scriptDropdown.SelectedIndex].name == "Baseline Training (CartPole)";
             baselineDefaultsButton.Enabled = isBaselineCartpole;
