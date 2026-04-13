@@ -2,7 +2,10 @@
 
 **THIS IS MY CLONE OF THE ORIGINAL MAXENT PROJECT, WITH MY MODIFICATIONS TO GET IT TO RUN IN 2026, BECAUSE I DO NOT HAVE WRITE ACCESS TO THE ORIGINAL REPO**
 
-# Notes from ACK and etc
+# Notes 
+
+```
+(notes from abbyvansoest)
 
 Efficient Maximum-Entropy Exploration
 
@@ -31,6 +34,7 @@ Note that this code is memory-intensive. It is set up to run on a specialized de
 Dependencies: Tensoflow, OpenAI Gym/Mujoco license, matplotlib, numpy, OpenAI SpinningUp, scipy
 
 See the respective directories for each environment for commands to run and recreate experiments.
+```
 
 ## Dev Notes
 

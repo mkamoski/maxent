@@ -35,26 +35,42 @@ action_dim = int(env.action_space.sample().shape[0])
 features = [0,1,3,4,5,6]
 height_bins = 20
 
-# min_bin = -20
-# max_bin = 20
-# num_bins = 20
+## Full settings (higher memory)
+# min_bin = -10
+# max_bin = 10
+# num_bins = 12
 
-min_bin = -10
-max_bin = 10
-num_bins = 12
+# Low-memory settings
+min_bin = -6
+max_bin = 6
+num_bins = 8
 
 start = 0
 stop = 2
 
-special = [0, 1]
-mins = [-12, -12]
-maxs = [12, 12]
-bins = [10, 10]
+## Full settings (higher memory)
+# special = [0, 1]
+# mins = [-12, -12]
+# maxs = [12, 12]
+# bins = [10, 10]
 
-plot_2d = [0,1]
-min_bin_2d_0, min_bin_2d_1 = -10, -10
-max_bin_2d_0, max_bin_2d_1  = 10, 10
-num_bins_2d_0,num_bins_2d_1 = 15, 15
+# Low-memory settings
+special = [0, 1]
+mins = [-8, -8]
+maxs = [8, 8]
+bins = [6, 6]
+
+## Full settings (higher memory)
+# plot_2d = [0,1]
+# min_bin_2d_0, min_bin_2d_1 = -10, -10
+# max_bin_2d_0, max_bin_2d_1  = 10, 10
+# num_bins_2d_0,num_bins_2d_1 = 15, 15
+
+# Low-memory settings
+plot_2d = [0, 1]
+min_bin_2d_0, min_bin_2d_1 = -6, -6
+max_bin_2d_0, max_bin_2d_1 = 6, 6
+num_bins_2d_0, num_bins_2d_1 = 10, 10
 
 reduce_dim = args.reduce_dim
 expected_state_dim = len(special) + reduce_dim
@@ -86,21 +102,27 @@ def discretize_value(value, bins):
 #### Set up environment.
 
 def get_state_bins():
-    
+
+    # Full settings (higher memory)
+    # state_bins = [
+    #       # position
+    #       discretize_range(-10, 10, 10),
+    #       discretize_range(-10, 10, 10),
+    #       discretize_range(0, 2*np.pi, 4),
+    #       discretize_range(0, 2*np.pi, 4),
+    #       discretize_range(-5, 5, 5),
+    #       discretize_range(-5, 5, 5)]
+
+    # Low-memory settings
     state_bins = [
           # position
-          discretize_range(-10, 10, 10),
-          discretize_range(-10, 10, 10),
-#           discretize_range(0, 2*np.pi, 4),
-          discretize_range(0, 2*np.pi, 4),
-          discretize_range(0, 2*np.pi, 4),
-#           # velocity
-          discretize_range(-5, 5, 5),
-          discretize_range(-5, 5, 5)]
-#           discretize_range(-5, 5, 5)]
-#           discretize_range(-5, 5, 3),
-#           discretize_range(-5, 5, 3)]
-    
+          discretize_range(-6, 6, 6),
+          discretize_range(-6, 6, 6),
+          discretize_range(0, 2*np.pi, 3),
+          discretize_range(0, 2*np.pi, 3),
+          discretize_range(-3, 3, 4),
+          discretize_range(-3, 3, 4)]
+
     return state_bins
 
 def get_state_bins_reduced():

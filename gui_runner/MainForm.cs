@@ -956,7 +956,7 @@ namespace MaxEntRunner
         private string SaveOutputToFile()
         {
             string timestamp = DateTime.Now.ToString("yyyy-MM-dd-HHmm-ss-fff");
-            string fileName = $"maxent-output={timestamp}.txt";
+            string fileName = $"maxent-output-{timestamp}.txt";
             string outputDir = @"C:\test";
             Directory.CreateDirectory(outputDir);
             string filePath = Path.Combine(outputDir, fileName);
