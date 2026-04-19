@@ -1,9 +1,40 @@
 
-   C:\Users\mkamoski1\source\repos\maxent\gui_runner\MainForm.cs(20,16): warning CS8618: Non-nullable field 'scriptDropdown' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the field as nullable.
-    C:\Users\mkamoski1\source\repos\maxent\gui_runner\MainForm.cs(20,16): warning CS8618: Non-nullable field 'descriptionBox' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the field as nullable.
-    C:\Users\mkamoski1\source\repos\maxent\gui_runner\MainForm.cs(20,16): warning CS8618: Non-nullable field 'paramPanel' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the field as nullable.
-    C:\Users\mkamoski1\source\repos\maxent\gui_runner\MainForm.cs(20,16): warning CS8618: Non-nullable field 'runButton' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the field as nullable.
-    C:\Users\mkamoski1\source\repos\maxent\gui_runner\MainForm.cs(20,16): warning CS8618: Non-nullable field 'viewImageButton' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the field as nullable.
-    C:\Users\mkamoski1\source\repos\maxent\gui_runner\MainForm.cs(20,16): warning CS8618: Non-nullable field 'outputBox' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the field as nullable.                                                                   C:\Users\mkamoski1\source\repos\maxent\gui_runner\MainForm.cs(20,16): warning CS8618: Non-nullable field 'imageBox' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the field as nullable.                                                                                                                                                                         Build succeeded with 7 warning(s) in 2.6s     
 
+Start Time: 16:41:14
+=== Starting: CartPole Demo (Quick) ===
+Script: CartPole Demo (Quick)
+Path:   C:\Users\mkamoski1\source\repos\maxent\demo_simple_cartpole.py
+Command: C:\Users\mkamoski1\source\repos\maxent\venv_maxent\Scripts\python.exe "C:\Users\mkamoski1\source\repos\maxent\demo_simple_cartpole.py"
+Working Dir: C:\Users\mkamoski1\source\repos\maxent
 
+======================================================================
+MaxEnt Demo: CartPole Policy Visualization
+======================================================================
+
+[1/5] Created CartPole-v0 environment
+[2/5] Collecting baseline data (100 episodes)...
+  Episode 20/100 complete
+  Episode 40/100 complete
+  Episode 60/100 complete
+  Episode 80/100 complete
+  Episode 100/100 complete
+[3/5] Baseline average reward: 21.07
+[4/5] Computing statistics...
+[5/5] Creating visualization...
+
+======================================================================
+SUCCESS! Graph saved to: demo_cartpole_results.png
+
+Statistics:
+  Mean Reward:   21.07 ± 10.35
+  Max Reward:    63.00
+  Min Reward:    8.00
+======================================================================
+
+=== SUCCESS (Exit Code: 0) ===
+Image loaded: C:\Users\mkamoski1\source\repos\maxent\demo_cartpole_results.png
+
+Start:  16:41:14
+Finish: 16:41:16
+Elapsed: 00:00:01
+Image loaded: C:\Users\mkamoski1\source\repos\maxent\demo_cartpole_results.png
