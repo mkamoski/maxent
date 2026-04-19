@@ -35,8 +35,8 @@ MaxEntRunnerPortable/
 
 2. **Build the EXE (one command - copy & paste):**
    ```powershell
-   # Main user (mkamoski1):
-   cd C:\Users\mkamoski1\source\repos\maxent\gui_runner; .\Publish.ps1
+# Main user (mkamoski1):
+cd C:\M\gui_runner; .\Publish.ps1
 
    # Other users - update path:
    # cd C:\YOUR\PATH\TO\maxent\gui_runner; .\Publish.ps1

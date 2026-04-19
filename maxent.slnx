@@ -1,0 +1,20 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".gitattributes" />
+    <File Path=".gitignore" />
+    <File Path="constraints.txt" />
+    <File Path="core.py" />
+    <File Path="demo_cartpole_results.png" />
+    <File Path="demo_simple_cartpole.py" />
+    <File Path="git-reset-v01 - Copy.ps1" />
+    <File Path="git-reset-v01.ps1" />
+    <File Path="git-reset-v02.ps1" />
+    <File Path="INSTALLATION_STATUS.md" />
+    <File Path="install_phase2.ps1" />
+    <File Path="LICENSE.txt" />
+  </Folder>
+  <Project Path="gui_runner/gui_runner.csproj" />
+  <Project Path="M.pyproj" Type="888888a0-9f3d-457c-b088-3a5042f75d52" Id="2e7f2364-ae62-482f-8ebb-f3299cda2348">
+    <Build Project="false" />
+  </Project>
+</Solution>

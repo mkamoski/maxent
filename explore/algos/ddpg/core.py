@@ -3,7 +3,7 @@ import tensorflow as tf
 
 
 def placeholder(dim=None):
-    return tf.placeholder(dtype=tf.float32, shape=(None,dim) if dim else (None,))
+    return tf.compat.v1.placeholder(dtype=tf.float32, shape=(None,dim) if dim else (None,))
 
 def placeholders(*args):
     return [placeholder(dim) for dim in args]

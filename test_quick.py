@@ -3,7 +3,13 @@ Quick Test Script - Run This First
 Tests the most critical components in under 30 seconds
 """
 
+import os
 import sys
+
+if "CUDA_VISIBLE_DEVICES" not in os.environ:
+    os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+if "TF_CPP_MIN_LOG_LEVEL" not in os.environ:
+    os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 def quick_test():
     print("=" * 60)

@@ -12,7 +12,7 @@
 
 ```powershell
 # Navigate to project
-cd C:\Users\mkamoski1\source\repos\maxent
+cd C:\M
 
 # Activate virtual environment
 .\venv_maxent\Scripts\Activate.ps1
@@ -65,7 +65,7 @@ python your_script.py
 
 ```powershell
 # Start your work session
-cd C:\Users\mkamoski1\source\repos\maxent
+cd C:\M
 .\venv_maxent\Scripts\Activate.ps1
 $env:HOME = $env:USERPROFILE
 
@@ -161,7 +161,7 @@ maxent/
 
 ```powershell
 # 1. Make sure you're in the right directory
-cd C:\Users\mkamoski1\source\repos\maxent
+cd C:\M
 
 # 2. Check virtual environment exists
 Test-Path .\venv_maxent\Scripts\python.exe
