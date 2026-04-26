@@ -3,8 +3,15 @@ Test basic project functionality without MuJoCo
 This tests core components that should all work now
 """
 
+import os
 import sys
 import numpy as np
+
+if "CUDA_VISIBLE_DEVICES" not in os.environ:
+    os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+if "TF_CPP_MIN_LOG_LEVEL" not in os.environ:
+    os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+
 import tensorflow as tf
 import gym
 

@@ -447,7 +447,10 @@ namespace MaxEntRunner
         {
             try
             {
-                string settingsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AppSettings.json");
+                string baseSettingsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AppSettings.json");
+                string repoRoot = FindRepoRoot();
+                string repoSettingsPath = Path.Combine(repoRoot, "gui_runner", "AppSettings.json");
+                string settingsPath = File.Exists(repoSettingsPath) ? repoSettingsPath : baseSettingsPath;
                 appSettings = File.Exists(settingsPath)
                     ? JsonSerializer.Deserialize<AppSettingsFile>(File.ReadAllText(settingsPath))
                     : null;
@@ -456,7 +459,6 @@ namespace MaxEntRunner
                 if (config != null)
                 {
                     string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-                    string repoRoot = FindRepoRoot();
                     pythonPath = ResolvePath(baseDir, config.pythonPath, repoRoot);
                 }
 
@@ -482,6 +484,11 @@ namespace MaxEntRunner
                     bool updated = false;
                     foreach (var setting in appSettings.Settings)
                     {
+                        if (TryUpdatePathPrefix(setting))
+                        {
+                            updated = true;
+                        }
+
                         if (string.IsNullOrWhiteSpace(setting.Default)
                             && computedDefaults.TryGetValue(setting.Name, out var value)
                             && !string.IsNullOrWhiteSpace(value))
@@ -549,6 +556,51 @@ namespace MaxEntRunner
                 ["AppSettingsFileName"] = Path.GetFileName(settingsPath),
                 ["AppSettingsFullPath"] = settingsPath
             };
+        }
+
+        private static bool TryUpdatePathPrefix(AppSettingEntry setting)
+        {
+            const string oldForwardPrefix = "C:/Users/mkamoski1/source/repos/maxent/";
+            const string oldBackPrefix = "C:\\Users\\mkamoski1\\source\\repos\\maxent\\";
+            const string newPrefix = "c:/m/";
+
+            bool updated = false;
+            if (!string.IsNullOrWhiteSpace(setting.Default))
+            {
+                string replaced = ReplacePrefix(setting.Default, oldForwardPrefix, oldBackPrefix, newPrefix);
+                if (!string.Equals(replaced, setting.Default, StringComparison.OrdinalIgnoreCase))
+                {
+                    setting.Default = replaced;
+                    updated = true;
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(setting.User))
+            {
+                string replaced = ReplacePrefix(setting.User, oldForwardPrefix, oldBackPrefix, newPrefix);
+                if (!string.Equals(replaced, setting.User, StringComparison.OrdinalIgnoreCase))
+                {
+                    setting.User = replaced;
+                    updated = true;
+                }
+            }
+
+            return updated;
+        }
+
+        private static string ReplacePrefix(string value, string forwardPrefix, string backPrefix, string newPrefix)
+        {
+            if (value.StartsWith(forwardPrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                return newPrefix + value.Substring(forwardPrefix.Length);
+            }
+
+            if (value.StartsWith(backPrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                return newPrefix + value.Substring(backPrefix.Length).Replace('\\', '/');
+            }
+
+            return value;
         }
 
         private void LoadDocumentationList()
@@ -826,7 +878,7 @@ namespace MaxEntRunner
                 startInfo.EnvironmentVariables["PYTHONIOENCODING"] = "utf-8";
                 // Silence CUDA/GPU warnings on machines without GPU drivers
                 startInfo.EnvironmentVariables["CUDA_VISIBLE_DEVICES"] = "-1";
-                startInfo.EnvironmentVariables["TF_CPP_MIN_LOG_LEVEL"] = "2";
+                startInfo.EnvironmentVariables["TF_CPP_MIN_LOG_LEVEL"] = "3";
 
                 AppendOutput($"Command: {pythonPath} {args}\n", Color.Cyan);
                 AppendOutput($"Working Dir: {startInfo.WorkingDirectory}\n\n", Color.Cyan);

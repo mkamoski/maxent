@@ -3,9 +3,9 @@
 Start Time: 16:41:14
 === Starting: CartPole Demo (Quick) ===
 Script: CartPole Demo (Quick)
-Path:   C:\Users\mkamoski1\source\repos\maxent\demo_simple_cartpole.py
-Command: C:\Users\mkamoski1\source\repos\maxent\venv_maxent\Scripts\python.exe "C:\Users\mkamoski1\source\repos\maxent\demo_simple_cartpole.py"
-Working Dir: C:\Users\mkamoski1\source\repos\maxent
+Path:   C:\M\demo_simple_cartpole.py
+Command: C:\M\venv_maxent\Scripts\python.exe "C:\M\demo_simple_cartpole.py"
+Working Dir: C:\M
 
 ======================================================================
 MaxEnt Demo: CartPole Policy Visualization
@@ -32,9 +32,9 @@ Statistics:
 ======================================================================
 
 === SUCCESS (Exit Code: 0) ===
-Image loaded: C:\Users\mkamoski1\source\repos\maxent\demo_cartpole_results.png
+Image loaded: C:\M\demo_cartpole_results.png
 
 Start:  16:41:14
 Finish: 16:41:16
 Elapsed: 00:00:01
-Image loaded: C:\Users\mkamoski1\source\repos\maxent\demo_cartpole_results.png
+Image loaded: C:\M\demo_cartpole_results.png
