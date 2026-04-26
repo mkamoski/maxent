@@ -878,7 +878,7 @@ namespace MaxEntRunner
                 startInfo.EnvironmentVariables["PYTHONIOENCODING"] = "utf-8";
                 // Silence CUDA/GPU warnings on machines without GPU drivers
                 startInfo.EnvironmentVariables["CUDA_VISIBLE_DEVICES"] = "-1";
-                startInfo.EnvironmentVariables["TF_CPP_MIN_LOG_LEVEL"] = "2";
+                startInfo.EnvironmentVariables["TF_CPP_MIN_LOG_LEVEL"] = "3";
 
                 AppendOutput($"Command: {pythonPath} {args}\n", Color.Cyan);
                 AppendOutput($"Working Dir: {startInfo.WorkingDirectory}\n\n", Color.Cyan);
