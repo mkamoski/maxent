@@ -57,7 +57,7 @@ def quick_test():
     print("[4/5] Testing Gym CartPole...", end=" ")
     try:
         import gymnasium as gym
-        env = gym.make('CartPole-v0')
+        env = gym.make('CartPole-v1')
         obs = env.reset()
         env.close()
         print(f"[OK] shape={obs.shape}")

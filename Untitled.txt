@@ -11,7 +11,7 @@ Working Dir: C:\M
 MaxEnt Demo: CartPole Policy Visualization
 ======================================================================
 
-[1/5] Created CartPole-v0 environment
+[1/5] Created CartPole-v1 environment
 [2/5] Collecting baseline data (100 episodes)...
   Episode 20/100 complete
   Episode 40/100 complete

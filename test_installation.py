@@ -97,12 +97,12 @@ def test_gym_environments():
     
     # Test basic environment
     try:
-        env = gym.make('CartPole-v0')
+        env = gym.make('CartPole-v1')
         obs = env.reset()
-        print(f"✓ CartPole-v0 created successfully (obs shape: {obs.shape})")
+        print(f"✓ CartPole-v1 created successfully (obs shape: {obs.shape})")
         env.close()
     except Exception as e:
-        print(f"✗ Failed to create CartPole-v0: {e}")
+        print(f"✗ Failed to create CartPole-v1: {e}")
         return False
     
     # Test MuJoCo environments (optional)
