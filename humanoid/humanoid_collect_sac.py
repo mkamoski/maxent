@@ -15,7 +15,7 @@ from scipy.interpolate import interp2d
 from scipy.interpolate import spline
 from tabulate import tabulate
 
-import gym
+import gymnasium as gym
 from gym import wrappers
 import tensorflow as tf
 

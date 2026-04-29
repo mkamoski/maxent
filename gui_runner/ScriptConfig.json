@@ -4,7 +4,7 @@
     {
       "name": "CartPole Demo (Quick)",
       "file": "..\\demo_simple_cartpole.py",
-      "description": "Overview: Randome policy on CartPole with visualization (1.25 min)",
+      "description": "Overview: Randome policy on CartPole with visualization (1 minute)",
       "parameters": [],
       "outputImage": "..\\demo_cartpole_results.png"
     },
@@ -18,7 +18,7 @@
     {
       "name": "Full Functionality Test",
       "file": "..\\test_basic_functionality.py",
-      "description": "Overview: 7 comprehensive tests (2.5 min)",
+      "description": "Overview: 7 comprehensive tests (1 minute)",
       "parameters": [],
       "outputImage": null
     },

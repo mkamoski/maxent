@@ -12,7 +12,7 @@ import time
 import random
 import numpy as np
 import scipy.stats
-import gym
+import gymnasium as gym
 from gym import wrappers
 
 import torch

@@ -19,7 +19,7 @@
 # 17 : ffoot     hinge       angular velocity (rad/s)
 
 
-import gym
+import gymnasium as gym
 import time
 import numpy as np
 

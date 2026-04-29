@@ -9,7 +9,7 @@ import torch.optim as optim
 from torch.distributions import Categorical
 from torch.distributions import Normal
 
-import gym
+import gymnasium as gym
 from gym import wrappers
 import base_utils
 

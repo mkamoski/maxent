@@ -15,7 +15,7 @@ import scipy.stats
 from scipy.interpolate import interp2d, make_interp_spline
 from scipy.stats import norm
 
-import gym
+import gymnasium as gym
 
 from cart_entropy_policy import CartEntropyPolicy
 import base_utils

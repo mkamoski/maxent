@@ -37,7 +37,7 @@ def test_imports():
             version = getattr(module, '__version__', 'unknown')
             print(f"✓ {package_name:20} version {version}")
             results[package_name] = True
-        except ImportError as e:
+        except Exception as e:
             print(f"✗ {package_name:20} FAILED: {e}")
             results[package_name] = False
     
@@ -54,7 +54,7 @@ def test_imports():
             version = getattr(module, '__version__', 'installed')
             print(f"✓ {package_name:20} version {version}")
             results[package_name] = True
-        except ImportError:
+        except Exception:
             print(f"○ {package_name:20} not installed (optional)")
             results[package_name] = False
     
@@ -90,7 +90,7 @@ def test_gym_environments():
     print("=" * 60)
     
     try:
-        import gym
+        import gymnasium as gym
     except ImportError:
         print("✗ Gym not installed, skipping environment tests")
         return False
@@ -133,6 +133,10 @@ def test_tensorflow():
     print("=" * 60)
     
     try:
+        if "CUDA_VISIBLE_DEVICES" not in os.environ:
+            os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+        if "TF_CPP_MIN_LOG_LEVEL" not in os.environ:
+            os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
         import tensorflow as tf
         print(f"✓ TensorFlow version: {tf.__version__}")
         
