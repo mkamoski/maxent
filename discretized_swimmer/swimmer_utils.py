@@ -10,7 +10,7 @@
 # 8 : joint1 angular vel
 # 9 : joint2 angular vel
 
-import gym
+import gymnasium as gym
 import time
 import numpy as np
 

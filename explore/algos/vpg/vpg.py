@@ -1,7 +1,7 @@
 import random
 import numpy as np
 import tensorflow as tf
-import gym
+import gymnasium as gym
 import time
 import algos.vpg.core as core
 from spinup.utils.logx import EpochLogger

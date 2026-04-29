@@ -21,7 +21,7 @@
 # 15-21 - 3d velocity/angular velocity
 # 23-29 - joint velocities
 
-import gym
+import gymnasium as gym
 import time
 import numpy as np
 

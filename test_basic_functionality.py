@@ -13,7 +13,7 @@ if "TF_CPP_MIN_LOG_LEVEL" not in os.environ:
     os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 import tensorflow as tf
-import gym
+import gymnasium as gym
 
 print("=" * 70)
 print("MaxEnt Basic Functionality Test")

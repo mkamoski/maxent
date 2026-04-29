@@ -20,7 +20,7 @@ sys.path.append(os.getenv("HOME") + '/maxent')
 sys.path.append(os.getenv("HOME") + '/spinningup')
 
 import random
-import gym
+import gymnasium as gym
 from spinup.utils.run_utils import setup_logger_kwargs
 from spinup.utils.mpi_tools import mpi_fork
 

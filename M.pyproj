@@ -20,6 +20,7 @@
     <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include=".github\copilot-instructions.md" />
     <Content Include="ant\data\expert_fully_corrective\model00\progress.txt" />
     <Content Include="ant\data\expert_fully_corrective\model01\progress.txt" />
     <Content Include="ant\data\expert_fully_corrective\model02\progress.txt" />
@@ -12346,6 +12347,7 @@
     <Compile Include="walker\walker_utils.py" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include=".github\" />
     <Folder Include="ant" />
     <Folder Include="ant\data\" />
     <Folder Include="ant\data\expert_fully_corrective\" />

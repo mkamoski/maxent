@@ -1,4 +1,4 @@
-import gym
+import gymnasium as gym
 from gym import wrappers
 
 env = gym.make("Ant-v2")

@@ -12,7 +12,7 @@ import random
 import numpy as np
 from tabulate import tabulate
 
-import gym
+import gymnasium as gym
 from gym import wrappers
 import tensorflow as tf
 

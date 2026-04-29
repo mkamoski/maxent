@@ -1,6 +1,6 @@
 import numpy as np
 import tensorflow as tf
-import gym
+import gymnasium as gym
 import time
 import spinup.algos.trpo.core as core
 from spinup.utils.logx import EpochLogger

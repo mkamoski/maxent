@@ -6,7 +6,7 @@ sys.path.append(os.getenv("HOME") + '/maxent')
 
 import numpy as np
 import tensorflow as tf
-import gym
+import gymnasium as gym
 from gym import wrappers
 
 import time
