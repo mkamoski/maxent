@@ -8,6 +8,7 @@ USAGE:
   Run from terminal: python demo_simple_cartpole.py
 """
 
+import os
 import numpy as np
 import matplotlib
 matplotlib.use('Agg')  # Use non-interactive backend
@@ -20,8 +21,8 @@ print("=" * 70)
 print()
 
 # Create environment
-env = gym.make('CartPole-v0')
-print("[1/5] Created CartPole-v0 environment")
+env = gym.make('CartPole-v1')
+print("[1/5] Created CartPole-v1 environment")
 
 # Collect random baseline data
 print("[2/5] Collecting baseline data (100 episodes)...")
@@ -31,7 +32,9 @@ for episode in range(100):
     episode_reward = 0
     for step in range(200):
         action = env.action_space.sample()  # Random action
-        obs, reward, done, info = env.step(action)
+        #obs, reward, done, info = env.step(action)
+        obs, reward, terminated, truncated, info = env.step(action)
+        done = terminated or truncated
         episode_reward += reward
         if done:
             break
@@ -78,11 +81,35 @@ ax2.grid(True, alpha=0.3, axis='y')
 plt.tight_layout()
 
 # Save figure
-output_file = 'demo_cartpole_results.png'
-plt.savefig(output_file, dpi=150, bbox_inches='tight')
-print()
-print("=" * 70)
-print(f"SUCCESS! Graph saved to: {output_file}")
+
+
+# output_file = 'demo_cartpole_results.png'
+# plt.savefig(output_file, dpi=150, bbox_inches='tight')
+# print()
+# print("=" * 70)
+# print(f"SUCCESS! Graph saved to: {output_file}")
+
+# Get the directory of the current script
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Set the output filename
+output_filename = "demo_cartpole_results.png"
+
+# WSL path for saving
+output_file = os.path.join(script_dir, output_filename)
+
+# Convert WSL path to Windows path if running under WSL
+if output_file.startswith("/mnt/"):
+    drive_letter = output_file[5].upper()
+    win_path_part = output_file[6:].replace('/', '\\')
+    windows_path = f"{drive_letter}:{win_path_part}"
+else:
+    windows_path = output_file
+
+plt.savefig(output_file)
+print(f"SUCCESS! Graph saved to: {windows_path}")
+
+
 print()
 print("Statistics:")
 print(f"  Mean Reward:   {mean_reward:.2f} ± {std_reward:.2f}")

@@ -83,13 +83,15 @@ except Exception as e:
 # Test 6: Gym environment
 print("\n[Test 6/7] OpenAI Gym CartPole...")
 try:
-    env = gym.make('CartPole-v0')
+    env = gym.make('CartPole-v1')
     obs = env.reset()
     assert obs.shape == (4,)
     action = env.action_space.sample()
-    obs, reward, done, info = env.step(action)
+    # obs, reward, done, info = env.step(action)
+    obs, reward, terminated, truncated, info = env.step(action)
+    done = terminated or truncated  
     env.close()
-    print(f"  [PASS] CartPole-v0 works, obs shape={obs.shape}, action={action}")
+    print(f"  [PASS] CartPole-v1 works, obs shape={obs.shape}, action={action}")
 except Exception as e:
     print(f"  [FAIL] Gym CartPole error: {e}")
     sys.exit(1)
